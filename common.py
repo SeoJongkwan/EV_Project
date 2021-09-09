@@ -1,83 +1,48 @@
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-from common import Data
 
-data = Data()
-file = data.file()
-msg_header = data.structure()[0]
-msg_body = data.structure()[1]
-msg_index = data.structure()[2]
-msg_type = data.msg_type()
+class Data:
+    def file(self):
+        file_name = "dc_charger_mt_16.csv"
+        file = pd.read_csv("data/{}".format(file_name))
+        file['msg'] = file['msg'].str.replace(' ', '')
+        print(file_name)
+        return file
+    # structure: name[length:data]
+    def structure(self):
+        header = {'ServerId':[1, '0x00'], 'ChargerId':[6,'0xXX'], 'Length':[2,'0xXX']}
+        body = {'MessageType':[1,'0xXX'],'SequenceNumber':[1,'0xXX'], 'DataLength':[1,'0xXX'],'Data':['n','0xXX']}
 
+        base_index = []
+        serverId_index = header["ServerId"][0]*2
+        ChargerId_index = serverId_index+(header['ChargerId'][0]*2)
+        Length_index = ChargerId_index+(header['Length'][0]*2)
 
-def select_mt(df, mt):
-    index = []
-    for i in range(len(df)):
-        if df['msg'][i][msg_index[2]:msg_index[3]]==mt:
-            index.append(i)
-    df1 = df.loc[index]
-    df1.to_csv("data/dc_charger_mt_{}.csv".format(mt), index=False)
-    print("Message Type:{} {}".format(mt, msg_type[mt]))
-    return df1
+        mt_index = Length_index+(body['MessageType'][0]*2)
+        seq_index = mt_index+(body['SequenceNumber'][0]*2)
+        dl_index = seq_index+(body['DataLength'][0]*2)
 
-csr = select_mt(file, '16')
+        base_index.extend([serverId_index, ChargerId_index, Length_index, mt_index, seq_index, dl_index])
+        return header, body, base_index
 
-# csr = pd.read_csv('data/dc_charger_mt_16.csv')
-
-test = csr.loc[0, 'msg']
-ServerId = test[0:msg_index[0]]
-ChargerId = test[msg_index[0]:msg_index[1]]
-Length = test[msg_index[1]:msg_index[2]]
-MessageType = test[msg_index[2]:msg_index[3]]
-SequenceNumber = test[msg_index[3]:msg_index[4]]
-DataLength = test[msg_index[4]:msg_index[5]]
-
-
-#data name:[length, data, value_length]
-csr_struct = {'ChargeCurrent':[1,'0x02',2],'ChargeVoltage':[1,'0x03',2],'Temperature':[1,'0x04',1],
-            'AccumulatedWatt':[1,'05',3],'AccessId':[1,'0x09',4],'ElaspedTime':[1,'0A',3],'ChargerNumber':[1,'33',2]}
-
-
-ChargeCurrent_index = msg_index[5]+csr_struct['ChargeCurrent'][0]*2
-ChargeCurrent_indicator = test[msg_index[5]:ChargeCurrent_index]
-ChargeCurrent_value = ChargeCurrent_index+csr_struct['ChargeCurrent'][2]*2
-ChargeCurrent = test[ChargeCurrent_index:ChargeCurrent_value]
-
-ChargeVoltage_index = ChargeCurrent_value+csr_struct['ChargeVoltage'][0]*2
-ChargeVoltage_indicator = test[ChargeCurrent_value:ChargeVoltage_index]
-ChargeVoltage_value = ChargeVoltage_index+csr_struct['ChargeVoltage'][2]*2
-ChargeVoltage = test[ChargeVoltage_index:ChargeVoltage_value]
-
-Temperature_index = ChargeVoltage_value+csr_struct['Temperature'][0]*2
-Temperature_indicator = test[ChargeVoltage_value:Temperature_index]
-Temperature_value = Temperature_index+csr_struct['Temperature'][2]*2
-Temperature = test[Temperature_index:Temperature_value]
-
-# ChargeVolta'ge_index = msg_index[5] + csr_struct['ChargeVoltage'][0]*2
-# Temperature_index = msg_index[5] + (csr_struct['Temperature'][0]*2)
-# AccumulatedWatt_index = msg_index[5] + (csr_struct['AccumulatedWatt'][0]*2)
-# AccessId_index = msg_index[5] + (csr_struct['AccessId'][0]*2)
-# ElaspedTime_index = msg_index[5] + (csr_struct['ElaspedTime'][0]*2)
-# ChargerNumber_index = msg_index[5] + (csr_struct['ChargerNumber'][0]*2)
-
-# ChargeVoltage_index = ChargeCurrent_index + (csr_struct['Temperature'][0] * 2)
+    def msg_type(self):
+        type = {'05':['Access Request','충전기<-서버'], '09':['Cancel Request','충전기<-서버'], '0D':['FW Upgrade Request','충전기<-서버','v1.0'],
+                '0E':['FW Upgrade Response','충전기->서버','v1.0'], '0F':['Charger Reboot Request','충전기<-서버', 'v1.0'],
+                '10':['Charger Reboot Response','충전기->서버','v1.0'], '15':['Device Status Report','충전기->서버'],
+                '16':['Charging Status Report','충전기->서버'], '1A':['Device Status Report ACK','충전기<-서버'],
+                '1B':['Charging Status Report ACK','충전기<-서버'], '22':['Device Init Request','충전기->서버'],
+                '23':['Device Init Response','충전기<-서버'], '24':['RF Card Device Status Report','충전기->서버','v0.2'],
+                '25':['RF Card Status Report ACK / IC Card Payment Response','충전기<-서버','v0.2'],
+                '26':['IC Card Payment Response','충전기->서버','v0.5'], '27':['RF Card Auth Cancel Report','충전기->서버','v0.5'],
+                '28':['RF/IC Card Auth Cancel Response','충전기<-서버','v0.5'], '29':['IC Card Auth Cancel Report','충전기->서버','v0.6']
+                }
+        return type
 
 
 
-#
 
 
-# csr.loc[0,'msg']
-# cc[0:msg_locate['ServerId']]
-# msg_locate
 
-# dc_charger = pd.read_csv("data/dc_100kW.csv")
-# # dc_charger = pd.read_csv("data/dc_charger_mt_16.csv")
-#
-# dc_charger['msg'] = dc_charger['msg'].str.replace(' ','')
-#
 # msg_type = {'05':['Access Request','충전기<-서버'], '09':['Cancel Request','충전기<-서버'], '0D':['FW Upgrade Request','충전기<-서버','v1.0'],
 #             '0E':['FW Upgrade Response','충전기->서버','v1.0'], '0F':['Charger Reboot Request','충전기<-서버', 'v1.0'],
 #             '10':['Charger Reboot Response','충전기->서버','v1.0'], '15':['Device Status Report','충전기->서버'],
