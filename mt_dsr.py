@@ -75,22 +75,9 @@ data_convert(dsr_original, dsr_parsing)
 dsr_parsing['Send'] = dsr_mt['Send'].copy()
 dsr_parsing['msgId'] = dsr_mt['msgId'].copy()
 dsr_parsing.insert(0, 'RegDt', dsr_mt['RegDt'].copy())
-dsr_parsing['RegDt'] = pd.to_datetime(dsr_mt['RegDt'], format='%Y-%m-%d %H:%M:%S')
 dsr_parsing.to_csv(args.data_path + "dc_100kW_dsr.csv", index=False)
 
 dsr_done = pd.read_csv(args.data_path + "dc_100kW_dsr.csv", dtype='str')
 select_cols = ['RegDt','ChargerId', 'DeviceStatus', 'AccessId', 'ChargerNumber']
 dsr = dsr_done[select_cols]
-
-
-# dsr_original.dtypes
-# csr_ack.columns
-# csr_ack.dtypes
-# csr_ack.describe()
-#
-# csr_ack.ChargerId.value_counts()
-# csr_ack.ChargerId.nunique()
-#
-# plt.plot(csr_ack["RegDt"], csr_ack["RequireWatt"])
-# sns.distplot(csr_ack["RequireWatt"])
-# plt.show()
+dsr['RegDt'] = pd.to_datetime(dsr['RegDt'], format='%Y-%m-%d %H:%M:%S')

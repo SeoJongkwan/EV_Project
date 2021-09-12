@@ -117,7 +117,6 @@ data_convert(csr_original, csr_parsing)
 csr_parsing['Send'] = csr_mt['Send'].copy()
 csr_parsing['msgId'] = csr_mt['msgId'].copy()
 csr_parsing.insert(0, 'RegDt', csr_mt['RegDt'].copy())
-csr_parsing["RegDt"] = pd.to_datetime(csr_parsing["RegDt"], format='%Y-%m-%d %H:%M:%S')
 csr_parsing.to_csv(args.data_path + "dc_100kW_csr.csv", index=False)
 
 csr_done = pd.read_csv(args.data_path + "dc_100kW_csr.csv", dtype='str')
@@ -125,6 +124,7 @@ select_cols = ['RegDt','ChargerId','ElaspedTime','SequenceNumber','AccumulatedWa
 csr = csr_done[select_cols]
 convert_cols = ["ChargeCurrent", "ChargeVoltage", "AccumulatedWatt"]
 csr[convert_cols] = csr[convert_cols].apply(pd.to_numeric)
+csr["RegDt"] = pd.to_datetime(csr["RegDt"], format='%Y-%m-%d %H:%M:%S')
 
 # csr.columns
 # csr.dtypes

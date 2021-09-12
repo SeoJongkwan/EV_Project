@@ -96,23 +96,12 @@ csr_ack_parsing['ServerId'] = csr_ack_original['ServerId'].copy()
 csr_ack_parsing['Send'] = csr_ack_mt['Send'].copy()
 csr_ack_parsing['msgId'] = csr_ack_mt['msgId'].copy()
 csr_ack_parsing.insert(0, 'RegDt', csr_ack_mt['RegDt'].copy())
-csr_ack_parsing["RegDt"] = pd.to_datetime(csr_ack_parsing["RegDt"], format='%Y-%m-%d %H:%M:%S')
 csr_ack_parsing.to_csv(args.data_path + "dc_100kW_csr_ack.csv", index=False)
 
-csr_ack_done = pd.read_csv(args.data_path + "dc_100kW_csr_ack.csv")
+csr_ack_done = pd.read_csv(args.data_path + "dc_100kW_csr_ack.csv", dtype='str')
 select_cols = ['RegDt','ChargerId','MessagePending','RequireWatt','WakeupInterval','ChargingFee']
 csr_ack = csr_ack_done[select_cols]
-convert_cols = ['MessagePending','RequireWatt','WakeupInterval','ChargingFee']
-# csr_ack[convert_cols] = csr_ack[convert_cols].apply(pd.to_numeric)
-
-# csr_ack_done.columns
-# csr_ack.columns
-# csr_ack.dtypes
-# csr_ack.describe()
-#
-# csr_ack.ChargerId.value_counts()
-# csr_ack.ChargerId.nunique()
-#
-# plt.plot(csr_ack["RegDt"], csr_ack["RequireWatt"])
-# sns.distplot(csr_ack["RequireWatt"])
-# plt.show()
+csr_ack = csr_ack.copy()
+convert_cols = ["MessagePending","RequireWatt","WakeupInterval","ChargingFee"]
+csr_ack[convert_cols] = csr_ack[convert_cols].apply(pd.to_numeric)
+csr_ack["RegDt"] = pd.to_datetime(csr_ack["RegDt"], format='%Y-%m-%d %H:%M:%S')
