@@ -1,0 +1,6 @@
+[DB]
+host=34.64.190.128
+dbname=bigdata
+user=energyusr
+password=energyusr
+port=5432
