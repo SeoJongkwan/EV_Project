@@ -72,10 +72,10 @@ def data_convert(target, df):
 
 data_convert(dsr_original, dsr_parsing)
 
-dsr_parsing['RegDt'] = dsr_mt['RegDt'].copy()
-dsr_parsing['RegDt'] = pd.to_datetime(dsr_parsing['RegDt'], format='%Y-%m-%d %H:%M:%S')
 dsr_parsing['Send'] = dsr_mt['Send'].copy()
 dsr_parsing['msgId'] = dsr_mt['msgId'].copy()
+dsr_parsing.insert(0, 'RegDt', dsr_mt['RegDt'].copy())
+dsr_parsing['RegDt'] = pd.to_datetime(dsr_mt['RegDt'], format='%Y-%m-%d %H:%M:%S')
 dsr_parsing.to_csv(args.data_path + "dc_100kW_dsr.csv", index=False)
 
 dsr_done = pd.read_csv(args.data_path + "dc_100kW_dsr.csv", dtype='str')

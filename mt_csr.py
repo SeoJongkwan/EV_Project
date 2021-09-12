@@ -114,14 +114,10 @@ def data_convert(target, df):
 
 data_convert(csr_original, csr_parsing)
 
-csr_parsing['RegDt'] = csr_mt['RegDt'].copy()
-csr_parsing["RegDt"] = pd.to_datetime(csr_parsing["RegDt"], format='%Y-%m-%d %H:%M:%S')
 csr_parsing['Send'] = csr_mt['Send'].copy()
 csr_parsing['msgId'] = csr_mt['msgId'].copy()
-cols = ['RegDt', 'ServerId', 'ChargerId', 'Length', 'MessageType', 'SequenceNumber','DataLength', 'ChargeCurrent_type', 'ChargeCurrent',
-       'ChargeVoltage_type', 'ChargeVoltage', 'Temperature_type','Temperature', 'AccumulatedWatt_type', 'AccumulatedWatt', 'AccessId_type',
-       'AccessId', 'ElaspedTime_type', 'ElaspedTime', 'ChargerNumber_type', 'ChargerNumber',  'Send', 'msgId']
-csr_parsing = csr_parsing[cols]
+csr_parsing.insert(0, 'RegDt', csr_mt['RegDt'].copy())
+csr_parsing["RegDt"] = pd.to_datetime(csr_parsing["RegDt"], format='%Y-%m-%d %H:%M:%S')
 csr_parsing.to_csv(args.data_path + "dc_100kW_csr.csv", index=False)
 
 csr_done = pd.read_csv(args.data_path + "dc_100kW_csr.csv", dtype='str')

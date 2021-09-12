@@ -73,18 +73,15 @@ def data_convert(target, df):
 
 data_convert(dsr_ack_original, dsr_ack_parsing)
 
-dsr_ack_parsing['RegDt'] = dsr_ack_mt['RegDt'].copy()
-dsr_ack_parsing['RegDt'] = pd.to_datetime(dsr_ack_mt['RegDt'], format='%Y-%m-%d %H:%M:%S')
 dsr_ack_parsing['ServerId'] = dsr_ack_original['ServerId'].copy()
 dsr_ack_parsing['Send'] = dsr_ack_mt['Send'].copy()
 dsr_ack_parsing['msgId'] = dsr_ack_mt['msgId'].copy()
-cols = ['RegDt', 'ServerId', 'ChargerId', 'Length', 'MessageType', 'SequenceNumber','DataLength', 'MessagePending_type',
-        'MessagePending', 'WakeupInterval_type', 'WakeupInterval', 'ChargerNumber_type','ChargerNumber', 'Send', 'msgId']
-dsr_ack_parsing = dsr_ack_parsing[cols]
+dsr_ack_parsing.insert(0, 'RegDt', dsr_ack_mt['RegDt'].copy())
+dsr_ack_parsing['RegDt'] = pd.to_datetime(dsr_ack_mt['RegDt'], format='%Y-%m-%d %H:%M:%S')
 dsr_ack_parsing.to_csv(args.data_path + "dc_100kW_dsr_ack.csv", index=False)
 
 dsr_ack_done = pd.read_csv(args.data_path + "dc_100kW_dsr_ack.csv", dtype='str')
 select_cols = ['RegDt','ChargerId', 'MessagePending', 'WakeupInterval', 'ChargerNumber']
 dsr_ack = dsr_ack_done[select_cols]
 
-dsr_ack_parsing.info()
+# dsr_ack_parsing.info()
