@@ -7,6 +7,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from common import Data         #common class
 
+plt.rcParams["font.family"] = "NanumBarunGothic"
+
 path = os.path.join(os.path.dirname(__file__), 'data/')
 parser = argparse.ArgumentParser()
 parser.add_argument('--data_path', default=path, help = "path to input file")
@@ -21,7 +23,7 @@ msg_index = file.structure()    #header, body index location in msg
 #select message type
 mt = '15'
 dsr_mt = file.select_mt(data, mt)
-dsr_mt.to_csv(args.data_path + "dc_100kW_mt_{}.csv".format(mt), index=False)
+# dsr_mt.to_csv(args.data_path + "dc_100kW_mt_{}.csv".format(mt), index=False)
 
 #data name:[length, data, value_length]
 dsr_struct = {'DeviceStatus':[1, '0x01', 1], 'AccessId':[1, '0x09', 4], 'ChargerNumber':[1, '33', 2]}
@@ -65,19 +67,31 @@ def msg_parsing(df):
 dsr_original = msg_parsing(dsr_mt)
 dsr_parsing = dsr_original.copy()
 
+status_code = {'00':'Unknown','01':'Charge Ready (케이블연결)','02':'Charging','03':'System Maintenance','04':'Not Accessible',
+                 '05':'Error','06':'Charging Waiting (충전중대기)','07':'Charging Finished','08':'전원 off','09':'비상버튼 작동',
+                 '0A':'충전케이블 분리 (idle)','0B':'시작버튼 누름','0C':'누전차단기 작동','0D':'충전케이블 연결오류','0E':'과전류 차단',
+                 '0F':'Live/Neutral 역상','1A':'Ready (B타입)','1B':'Ready (C타입)','1C':'Ready (콤보)','1D':'Ready (차데모)',
+                 '1E':'Ready (AC3상)','1F':'입력 과전압','20':'입력 저전압','21':'입력 MC 오류','22':'출력 MC 오류','23':'출력누설;선간절연 이상',
+                 '24':'파원모듈 이상','25':'전력계량기 오류','26':'침수 오류'}
+
 def data_convert(target, df):
     pd.set_option('mode.chained_assignment', None)
     for k in range(len(df)):
+        if df['DeviceStatus'][k] in status_code.keys():
+            df['DeviceStatus'][k] = status_code[df['DeviceStatus'][k]]
+        else:
+            print('not define Device Status Code')
         df['AccessId'][k] = int((target['AccessId'][k]), 16)
 
-data_convert(dsr_original, dsr_parsing)
-
-dsr_parsing['Send'] = dsr_mt['Send'].copy()
-dsr_parsing['msgId'] = dsr_mt['msgId'].copy()
-dsr_parsing.insert(0, 'RegDt', dsr_mt['RegDt'].copy())
-dsr_parsing.to_csv(args.data_path + "dc_100kW_dsr.csv", index=False)
+# data_convert(dsr_original, dsr_parsing)
+#
+# dsr_parsing['Send'] = dsr_mt['Send'].copy()
+# dsr_parsing['msgId'] = dsr_mt['msgId'].copy()
+# dsr_parsing.insert(0, 'RegDt', dsr_mt['RegDt'].copy())
+# dsr_parsing.to_csv(args.data_path + "dc_100kW_dsr.csv", index=False)
 
 dsr_done = pd.read_csv(args.data_path + "dc_100kW_dsr.csv", dtype='str')
 select_cols = ['RegDt','ChargerId', 'DeviceStatus', 'AccessId', 'ChargerNumber']
 dsr = dsr_done[select_cols]
 dsr['RegDt'] = pd.to_datetime(dsr['RegDt'], format='%Y-%m-%d %H:%M:%S')
+

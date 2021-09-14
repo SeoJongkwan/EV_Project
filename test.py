@@ -32,3 +32,9 @@ PATH = args.data_path + file_name
 data.columns
 data.insert(0, 'test', 4)
 
+
+# import matplotlib.font_manager as fm
+# f = fm.findSystemFonts(None, 'ttf')
+# fl = fm.FontProperties(fname=f[1])
+# fl.get_name()
+

@@ -25,17 +25,17 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--data_path', default=path, help = "path to input file")
 args = parser.parse_args()
 
-file_name = "dc_100kW_csr.csv"
+file_name = "dc_100kW_dsr.csv"
 data = pd.read_csv(args.data_path + file_name, dtype='str')
 PATH = args.data_path + file_name
-print(len(data.columns))
+print("# of field: ", len(data.columns))
 
-with open(PATH, 'r') as f:
+with open(PATH, 'r', encoding='UTF-8') as f:
     reader = csv.reader(f)
     next(f)
     for row in reader:
         cursor.execute(
-            "INSERT INTO charging_status_report VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)", row
+            "INSERT INTO device_status_report VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)", row
         )
 con.commit()
 print("Insert DB Success")
