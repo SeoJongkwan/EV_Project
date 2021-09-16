@@ -5,8 +5,7 @@ import numpy as np
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 import seaborn as sns
-import statistics        #statistics function module
-
+import statistics as st       #statistics function module
 
 path = os.path.join(os.path.dirname(__file__), 'data/')
 parser = argparse.ArgumentParser()
@@ -27,11 +26,15 @@ csr = csr_file[csr_cols]
 csr = csr.copy()
 csr['RegDt'] = pd.to_datetime(csr['RegDt'], format='%Y-%m-%d %H:%M:%S')
 
+dsr = st.check_nan_value(dsr)
+csr = st.check_nan_value(csr)
 
-dsr = statistics.check_nan_value(dsr)
-csr = statistics.check_nan_value(csr)
-
-
-dsr_vc = statistics.show_value_cnt(dsr, "DeviceStatus")
-
+dsr_vc = st.show_value_cnt(dsr, "DeviceStatus")
 dsr_charging = dsr.loc[dsr['DeviceStatus'] == 'Charging'].reset_index(drop=True)
+
+st.show_density(csr, 'AccumulatedWatt')
+
+t = csr.loc[csr['RegDt'].dt.month == 7]
+st.show_variable_relation(t, 'RegDt', 'ChargeCurrent', 'AccumulatedWatt')
+
+st.show_feature_correlation(csr, 'RegDt', 'AccumulatedWatt')

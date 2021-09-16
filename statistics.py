@@ -1,9 +1,11 @@
+import matplotlib
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-plt.rcParams["font.family"] = "NanumBarunGothic"
+plt.rc('font', family='NanumGothic', size=10)
+plt.rc('axes', titlesize=17, unicode_minus=False)
 
 def show_value_cnt(df, col):
     '''
@@ -36,3 +38,65 @@ def check_nan_value(df):
             return df1
     return df
 
+def show_feature_correlation(df, time, col):
+    df = df.set_index(time)
+    corr = df.corr(method='pearson')
+    mask = np.zeros_like(corr, dtype=np.bool)
+    mask[np.triu_indices_from(mask)] = True
+    mask[:,2]
+    fig, (ax1, ax2) = plt.subplots(1,2,figsize=(20,10))
+    # fig, ax1 = plt.subplots(1,1, figsize=(10, 6))
+    sns.heatmap(data=corr, mask=mask, annot=True, fmt='.2f', linewidths=.5, cmap ='Blues', vmin = -1, vmax = 1, ax=ax1)
+    buttom, top = ax1.get_ylim(); ax1.set_ylim(buttom+0.5, top-0.5)
+    ax1.set(title='Feature Correlation')
+
+    df_cor = corr.sort_values(col, axis=0, ascending=False)
+    df_cor[col].plot(kind='bar', color='cyan', ax=ax2)
+    ax2.set(ylabel='coefficient', title='Feature Importance')
+    plt.style.use('dark_background')
+    plt.tight_layout()
+    plt.show()
+
+def show_feature_importance(df, time, col):
+    df = df.set_index(time)
+    corr = df.corr(method='pearson')
+    mask = np.zeros_like(corr, dtype=np.bool)
+    mask[np.triu_indices_from(mask)] = True
+    mask[:,2]
+    fig, ax1 = plt.subplots(1,1,figsize=(12,8))
+
+    df_cor = corr.sort_values(col, axis=0, ascending=False)
+    df_cor[col].plot(kind='bar', color='cyan', ax=ax1)
+    ax1.set(ylabel='coefficient', title='Feature Importance')
+    plt.tight_layout()
+    plt.show()
+
+def show_variable_relation(df, time, col1, col2):
+    fig, ax1 = plt.subplots(figsize=(18,4))
+    sns.lineplot(df[time], df[col1], label=col1, color='plum', ax=ax1)
+    ax1.set(xlabel=col2, ylabel=col1, title='{} & {} Relation'.format(col1, col2)), ax1.legend(loc=2)
+    ax2 = ax1.twinx()
+    sns.lineplot(df[time], df[col2], label=col2, color='gold', ax=ax2), ax2.legend(loc=1)
+    plt.tight_layout()
+    plt.show()
+
+
+def show_density(df, col):
+    fig, (ax1, ax2) = plt.subplots(2, sharex=True, gridspec_kw={"height_ratios": (.15, .85)}, figsize=(18,4))
+    sns.boxplot(df[col], ax=ax1)
+    sns.distplot(df[col], norm_hist=True, ax=ax2)
+    ax1.set(xlabel='')
+    ax2.set(xlabel=col, ylabel='density', title='{} Disribution Density'.format(col))
+    plt.tight_layout()
+    plt.show()
+
+
+
+
+# import matplotlib.font_manager as fm
+# import matplotlib
+#
+# print(matplotlib.matplotlib_fname())
+# fonts = fm.fontManager.ttflist
+# fl = [f.name for f in fonts]
+# [(f.name, f.fname) for f in fonts if 'Nanum' in f.name]
