@@ -4,8 +4,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-plt.rc('font', family='NanumGothic', size=10)
-plt.rc('axes', titlesize=17, unicode_minus=False)
+plt.rc('font', family='AppleGothic', size=10)
+plt.rc('axes', unicode_minus=False)
+plt.rc('xtick', labelsize=10)
+plt.rc('ytick', labelsize=10)
 
 def show_value_cnt(df, col):
     '''
@@ -17,7 +19,9 @@ def show_value_cnt(df, col):
     df[col].value_counts().plot(kind='barh', figsize=(10, 5))
     for i, v in enumerate(value_count):
         plt.text(v+10, i, str(v), fontweight='bold')
-    plt.title('{} Value Count'.format(col))
+    start = str(df.iloc[0, 0])[:-9]
+    end = str(df.iloc[-1, 0])[:-9]
+    plt.title('{} Value Count: {} ~ {}'.format(col, start, end))
     plt.grid(True, axis='x')
     plt.tight_layout()
     plt.show()
@@ -39,6 +43,7 @@ def check_nan_value(df):
     return df
 
 def show_feature_correlation(df, time, col):
+    plt.style.use('dark_background')
     df = df.set_index(time)
     corr = df.corr(method='pearson')
     mask = np.zeros_like(corr, dtype=np.bool)
@@ -58,6 +63,7 @@ def show_feature_correlation(df, time, col):
     plt.show()
 
 def show_feature_importance(df, time, col):
+    plt.style.use('dark_background')
     df = df.set_index(time)
     corr = df.corr(method='pearson')
     mask = np.zeros_like(corr, dtype=np.bool)
@@ -72,7 +78,7 @@ def show_feature_importance(df, time, col):
     plt.show()
 
 def show_variable_relation(df, time, col1, col2):
-    fig, ax1 = plt.subplots(figsize=(18,4))
+    fig, ax1 = plt.subplots(figsize=(18,6))
     sns.lineplot(df[time], df[col1], label=col1, color='plum', ax=ax1)
     ax1.set(xlabel=col2, ylabel=col1, title='{} & {} Relation'.format(col1, col2)), ax1.legend(loc=2)
     ax2 = ax1.twinx()
@@ -89,8 +95,6 @@ def show_density(df, col):
     ax2.set(xlabel=col, ylabel='density', title='{} Disribution Density'.format(col))
     plt.tight_layout()
     plt.show()
-
-
 
 
 # import matplotlib.font_manager as fm
