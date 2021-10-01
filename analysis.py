@@ -16,6 +16,7 @@ dsr_file = pd.read_csv(args.data_path + "dc_100kW_dsr.csv")
 dsr_ack_file = pd.read_csv(args.data_path + "dc_100kW_dsr_ack.csv")
 csr_file = pd.read_csv(args.data_path + "dc_100kW_csr.csv")
 csr_ack_file = pd.read_csv(args.data_path + "dc_100kW_csr_ack.csv")
+user_file = pd.read_csv(args.data_path + 'dc_100kW_user.csv', encoding='UTF8')
 
 dsr_cols = ['RegDt', 'ChargerId', 'DeviceStatus', 'AccessId', 'ChargerNumber']
 dsr = dsr_file[dsr_cols]
