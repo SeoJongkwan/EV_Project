@@ -3,11 +3,27 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from matplotlib.ticker import MaxNLocator
 
 plt.rc('font', family='AppleGothic', size=10)
 plt.rc('axes', unicode_minus=False)
 plt.rc('xtick', labelsize=10)
 plt.rc('ytick', labelsize=10)
+
+def check_nan_value(df):
+    '''
+    :param df: NAN value check
+    :return: df except NAN value
+    '''
+    print('Check NAN Value on Each Column:\n{}'.format(df.isnull().sum()))
+    series = df.isnull().sum()
+    for value in series.values:
+        if value != 0:
+            df1 = df[df.isnull().any(1)]
+            print("NAN Value Location: {}\n{}".format(len(df1), df['RegDt'][df1.index]))
+            df1 = df.drop(df1.index).reset_index(drop=True)
+            return df1
+    return df
 
 def show_value_cnt(df, col):
     '''
@@ -27,20 +43,21 @@ def show_value_cnt(df, col):
     plt.show()
     return value_count
 
-def check_nan_value(df):
-    '''
-    :param df: NAN value check
-    :return: df except NAN value
-    '''
-    print('Check NAN Value on Each Column:\n{}'.format(df.isnull().sum()))
-    series = df.isnull().sum()
-    for value in series.values:
-        if value != 0:
-            df1 = df[df.isnull().any(1)]
-            print("NAN Value Location: {}\n{}".format(len(df1), df['RegDt'][df1.index]))
-            df1 = df.drop(df1.index).reset_index(drop=True)
-            return df1
-    return df
+def show_device_status(df, status):
+    status_df = df[df['DeviceStatus']==status]
+    print("-DeviceStatus:", status)
+    print("-ChargerNumber:", status_df['ChargerNumber'].unique())
+    cnt = status_df.groupby(df['RegDt'].dt.strftime('%m-%d %H:%M'))['RegDt'].count()
+    cnt1 = cnt.to_frame()
+    ax = cnt1.plot(kind='bar', figsize=(6, 3))
+    ax.yaxis.set_major_locator(MaxNLocator(integer=True))
+    ax.get_legend().remove()
+    plt.title("Count Device Status: {} / {} times".format(status, len(cnt1)))
+    plt.xticks(fontsize=7)
+    plt.yticks(fontsize=7)
+    plt.tight_layout()
+    plt.show()
+    return cnt
 
 def show_feature_correlation(df, time, col):
     plt.style.use('dark_background')
@@ -96,11 +113,3 @@ def show_density(df, col):
     plt.tight_layout()
     plt.show()
 
-
-# import matplotlib.font_manager as fm
-# import matplotlib
-#
-# print(matplotlib.matplotlib_fname())
-# fonts = fm.fontManager.ttflist
-# fl = [f.name for f in fonts]
-# [(f.name, f.fname) for f in fonts if 'Nanum' in f.name]

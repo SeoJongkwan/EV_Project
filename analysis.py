@@ -5,6 +5,7 @@ import numpy as np
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 import seaborn as sns
+
 import statistics as stat       #statistics function module
 
 path = os.path.join(os.path.dirname(__file__), 'data/')
@@ -16,6 +17,7 @@ dsr_file = pd.read_csv(args.data_path + "dc_100kW_dsr.csv")
 dsr_ack_file = pd.read_csv(args.data_path + "dc_100kW_dsr_ack.csv")
 csr_file = pd.read_csv(args.data_path + "dc_100kW_csr.csv")
 csr_ack_file = pd.read_csv(args.data_path + "dc_100kW_csr_ack.csv")
+ar_file = pd.read_csv(args.data_path + "dc_100kW_ar.csv")
 user_file = pd.read_csv(args.data_path + 'dc_100kW_user.csv', encoding='UTF8')
 
 dsr_cols = ['RegDt', 'ChargerId', 'DeviceStatus', 'AccessId', 'ChargerNumber']
@@ -33,17 +35,27 @@ csr_ack = csr_ack_file[csr_ack_cols]
 csr_ack = csr_ack.copy()
 csr_ack['RegDt'] = pd.to_datetime(csr_ack['RegDt'], format='%Y-%m-%d %H:%M:%S')
 
+
+
 #delete NAN data
 dsr = stat.check_nan_value(dsr)
 csr = stat.check_nan_value(csr)
 csr_ack = stat.check_nan_value(csr_ack)
 
+#Device Status Code
+print("\n-Device Status Type Count")
 dsr_status_cnt = stat.show_value_cnt(dsr, "DeviceStatus")
+#Device Status Code --> Error
+ds_error = stat.show_device_status(dsr, 'Error')
+
+
 dsr_charging = dsr.loc[dsr['DeviceStatus'] == 'Charging'].reset_index(drop=True)
 
-stat.show_density(csr, 'AccumulatedWatt')
 
-t = csr.loc[csr['RegDt'].dt.month == 7]
-stat.show_variable_relation(t, 'RegDt', 'ChargeCurrent', 'AccumulatedWatt')
+# stat.show_density(csr, 'AccumulatedWatt')
 
-stat.show_feature_correlation(csr, 'RegDt', 'AccumulatedWatt')
+# t = csr.loc[csr['RegDt'].dt.month == 7]
+# stat.show_variable_relation(t, 'RegDt', 'ChargeCurrent', 'AccumulatedWatt')
+
+# stat.show_feature_correlation(csr, 'RegDt', 'AccumulatedWatt')
+

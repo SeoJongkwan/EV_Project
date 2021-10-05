@@ -26,7 +26,7 @@ dsr_mt = file.select_mt(data, mt)
 # dsr_mt.to_csv(args.data_path + "dc_100kW_mt_{}.csv".format(mt), index=False)
 
 #data name:[length, data, value_length]
-dsr_struct = {'DeviceStatus':[1, '0x01', 1], 'AccessId':[1, '0x09', 4], 'ChargerNumber':[1, '33', 2]}
+dsr_struct = {'DeviceStatus':[1, '0x01', 1], 'AccessId':[1, '0x09', 4], 'ChargerNumber':[1, '0x33', 2]}
 
 def msg_parsing(df):
     ServerId, ChargerId, Length, MessageType, SequenceNumber, DataLength = [], [], [], [], [], []
@@ -74,24 +74,24 @@ status_code = {'00':'Unknown','01':'Charge Ready (케이블연결)','02':'Chargi
                  '1E':'Ready (AC3상)','1F':'입력 과전압','20':'입력 저전압','21':'입력 MC 오류','22':'출력 MC 오류','23':'출력누설;선간절연 이상',
                  '24':'파원모듈 이상','25':'전력계량기 오류','26':'침수 오류'}
 
-def data_convert(target, df):
+def data_convert(df):
     pd.set_option('mode.chained_assignment', None)
     for k in range(len(df)):
         if df['DeviceStatus'][k] in status_code.keys():
             df['DeviceStatus'][k] = status_code[df['DeviceStatus'][k]]
         else:
             print('not define Device Status Code')
-        df['AccessId'][k] = int((target['AccessId'][k]), 16)
+        df['AccessId'][k] = int((df['AccessId'][k]), 16)
+    return df
 
-# data_convert(dsr_original, dsr_parsing)
-#
-# dsr_parsing['Send'] = dsr_mt['Send'].copy()
-# dsr_parsing['msgId'] = dsr_mt['msgId'].copy()
-# dsr_parsing.insert(0, 'RegDt', dsr_mt['RegDt'].copy())
-# dsr_parsing.to_csv(args.data_path + "dc_100kW_dsr.csv", index=False)
+print("Data Convert:\n DeviceStatus, AccessId")
+data_convert(dsr_parsing)
 
-dsr_done = pd.read_csv(args.data_path + "dc_100kW_dsr.csv", dtype='str')
-select_cols = ['RegDt','ChargerId', 'DeviceStatus', 'AccessId', 'ChargerNumber']
-dsr = dsr_done[select_cols]
-dsr['RegDt'] = pd.to_datetime(dsr['RegDt'], format='%Y-%m-%d %H:%M:%S')
+dsr_parsing['Send'] = dsr_mt['Send'].copy()
+dsr_parsing['msgId'] = dsr_mt['msgId'].copy()
+dsr_parsing.insert(0, 'RegDt', dsr_mt['RegDt'].copy())
+
+save_file = "dc_100kW_dsr.csv"
+print("Save File: {}".format(save_file))
+dsr_parsing.to_csv(args.data_path + save_file, index=False)
 

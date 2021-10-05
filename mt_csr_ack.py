@@ -76,7 +76,7 @@ def msg_parsing(df):
 csr_ack_original = msg_parsing(csr_ack_mt)
 csr_ack_parsing = csr_ack_original.copy()
 
-def data_convert(target, df):
+def data_convert(df):
     mp = []
     for k in df['MessagePending'].to_numpy():
         mp.append(int([k][0], 16))
@@ -89,19 +89,16 @@ def data_convert(target, df):
     for k in df['ChargingFee'].to_numpy():
         cf.append(bytes.fromhex([k][0]).decode())
     df['ChargingFee'] = cf
+    return df
 
-data_convert(csr_ack_original, csr_ack_parsing)
+print("Data Convert:\n MessagePending, MessagePending, RequireWatt, ChargingFee")
+data_convert(csr_ack_parsing)
 
 csr_ack_parsing['ServerId'] = csr_ack_original['ServerId'].copy()
 csr_ack_parsing['Send'] = csr_ack_mt['Send'].copy()
 csr_ack_parsing['msgId'] = csr_ack_mt['msgId'].copy()
 csr_ack_parsing.insert(0, 'RegDt', csr_ack_mt['RegDt'].copy())
-csr_ack_parsing.to_csv(args.data_path + "dc_100kW_csr_ack.csv", index=False)
 
-csr_ack_done = pd.read_csv(args.data_path + "dc_100kW_csr_ack.csv", dtype='str')
-select_cols = ['RegDt','ChargerId','MessagePending','RequireWatt','WakeupInterval','ChargingFee']
-csr_ack = csr_ack_done[select_cols]
-csr_ack = csr_ack.copy()
-convert_cols = ["MessagePending","RequireWatt","WakeupInterval","ChargingFee"]
-csr_ack[convert_cols] = csr_ack[convert_cols].apply(pd.to_numeric)
-csr_ack["RegDt"] = pd.to_datetime(csr_ack["RegDt"], format='%Y-%m-%d %H:%M:%S')
+save_file = "dc_100kW_csr_ack.csv"
+print("Save File: {}".format(save_file))
+csr_ack_parsing.to_csv(args.data_path + save_file, index=False)

@@ -1,10 +1,7 @@
 import pandas as pd
 import argparse
 import os
-import numpy as np
 from tqdm import tqdm
-import matplotlib.pyplot as plt
-import seaborn as sns
 from common import Data         #common class
 
 path = os.path.join(os.path.dirname(__file__), 'data/')
@@ -89,6 +86,7 @@ csr_original = msg_parsing(csr_mt)
 csr_parsing = csr_original.copy()
 
 def data_convert(target, df):
+    pd.set_option('mode.chained_assignment', None)
     cc = []
     for k in df['ChargeCurrent'].to_numpy():
         cc.append(int([k][0], 16) * 10 / 1000)       #10mA
@@ -101,8 +99,9 @@ def data_convert(target, df):
     for k in df['AccumulatedWatt'].to_numpy():
         aw.append(int([k][0], 16) * 10 / 1000)       #1000mWh
     df['AccumulatedWatt'] = aw
+    for k in range(len(df)):
+        df['AccessId'][k] = int((df['AccessId'][k]), 16)
     #ElaspedTime: HH:MM:SS
-    pd.set_option('mode.chained_assignment', None)
     for j in tqdm(range(len(target)), desc='ElaspedTime Transform'):
         df['ElaspedTime'][j] = [target['ElaspedTime'][j][i:i + 2] for i in range(0, len(target['ElaspedTime'][j]), 2)]
         for c in range(len(df['ElaspedTime'][j])):
@@ -112,27 +111,13 @@ def data_convert(target, df):
                 df['ElaspedTime'][j][c] = df['ElaspedTime'][j][c].zfill(2)              #add 0
         df['ElaspedTime'][j] = int("".join(df['ElaspedTime'][j]))
 
+print("Data Convert:\n ChargeCurrent, ChargeVoltage, AccumulatedWatt, AccessId, ElaspedTime")
 data_convert(csr_original, csr_parsing)
 
 csr_parsing['Send'] = csr_mt['Send'].copy()
 csr_parsing['msgId'] = csr_mt['msgId'].copy()
 csr_parsing.insert(0, 'RegDt', csr_mt['RegDt'].copy())
-csr_parsing.to_csv(args.data_path + "dc_100kW_csr.csv", index=False)
 
-csr_done = pd.read_csv(args.data_path + "dc_100kW_csr.csv", dtype='str')
-select_cols = ['RegDt','ChargerId','ElaspedTime','SequenceNumber','AccumulatedWatt','ChargeCurrent','ChargeVoltage']
-csr = csr_done[select_cols]
-convert_cols = ["ChargeCurrent", "ChargeVoltage", "AccumulatedWatt"]
-csr[convert_cols] = csr[convert_cols].apply(pd.to_numeric)
-csr["RegDt"] = pd.to_datetime(csr["RegDt"], format='%Y-%m-%d %H:%M:%S')
-
-# csr.columns
-# csr.dtypes
-# csr.describe()
-#
-# csr.ServerId.value_counts()
-# csr.Send.nunique()
-#
-# plt.plot(csr_select["RegDt"], csr_select["AccumulatedWatt"])
-# sns.distplot(csr_select["AccumulatedWatt"])
-# plt.show()
+save_file = "dc_100kW_csr.csv"
+print("Save File: {}".format(save_file))
+csr_parsing.to_csv(args.data_path + save_file, index=False)
