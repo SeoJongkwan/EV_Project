@@ -44,20 +44,24 @@ def show_value_cnt(df, col):
     return value_count
 
 def show_device_status(df, status):
-    status_df = df[df['DeviceStatus']==status]
+    status_df = df[df['DeviceStatus']==status].reset_index(drop=True)
     print("-DeviceStatus:", status)
     print("-ChargerNumber:", status_df['ChargerNumber'].unique())
     cnt = status_df.groupby(df['RegDt'].dt.strftime('%m-%d %H:%M'))['RegDt'].count()
     cnt1 = cnt.to_frame()
-    ax = cnt1.plot(kind='bar', figsize=(6, 3))
+    ax = cnt1.plot(kind='bar', figsize=(5, 3), zorder=3, color='salmon')
     ax.yaxis.set_major_locator(MaxNLocator(integer=True))
     ax.get_legend().remove()
-    plt.title("Count Device Status: {} / {} times".format(status, len(cnt1)))
+    plt.title("Count Device Status: {} / {} times".format(status, len(cnt1)), fontdict={'size':'medium'})
     plt.xticks(fontsize=7)
     plt.yticks(fontsize=7)
+    plt.xlabel("RegDt", fontdict={'size':'small'})
+    plt.ylabel("count", fontdict={'size':'small'})
+    plt.grid(True, axis='y', linestyle='dashed')
     plt.tight_layout()
     plt.show()
     return cnt
+
 
 def show_feature_correlation(df, time, col):
     plt.style.use('dark_background')

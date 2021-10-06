@@ -107,6 +107,9 @@ def data_convert(df):
 print("Data Convert:\n AccessId, RequireCurrent, RequireWatt, ChargingTime, StartDelay")
 ar_parsing = data_convert(ar_parsing)
 
+ar_parsing.insert(0, 'RegDt', ar_mt['RegDt'].copy())
+
 save_file = "dc_100kW_ar.csv"
 print("Save File: {}".format(save_file))
 ar_parsing.to_csv(args.data_path + save_file, index=False)
+
