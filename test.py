@@ -9,6 +9,8 @@ from common import Data
 import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib.ticker import MaxNLocator
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
 
 path = os.path.join(os.path.dirname(__file__), 'data/')
@@ -75,35 +77,80 @@ def sequence_mt(file):
     file2 = file1[['ChargerId','RegDt','mt','exp']]
     return file2
 
-mt_info = sequence_mt(original_file)
-mt_info['RegDt'] = pd.to_datetime(mt_info['RegDt'], format='%Y-%m-%d %H:%M:%S')
+msg_sequence = sequence_mt(original_file)
+msg_sequence['RegDt'] = pd.to_datetime(msg_sequence['RegDt'], format='%Y-%m-%d %H:%M:%S')
 
-mt_info['mt'].unique()
-mt_info['exp'].value_counts()
+msg_sequence['mt'].unique()
+msg_sequence['exp'].value_counts().sum()
 
-def ds_charging(df, mt):
+
+#
+# def ds_charging(df, mt, opt='day'):
+#     status_df = df[df['mt'] == mt].reset_index(drop=True)
+#     print("{} / mt: {}".format(status_df['exp'][0], mt))
+#     cnt = pd.DataFrame()
+#     if opt == 'month':
+#         cnt = status_df.groupby(status_df['RegDt'].dt.strftime('%m'))['RegDt'].count()
+#     elif opt == 'day':
+#         cnt = status_df.groupby(status_df['RegDt'].dt.strftime('%m-%d'))['RegDt'].count()
+#     elif opt == 'hour':
+#         cnt = status_df.groupby(status_df['RegDt'].dt.strftime('%H'))['RegDt'].count()
+#
+#     cnt1 = cnt.to_frame()
+#     ax = cnt1.plot(kind='bar', figsize=(6, 3), color='cornflowerblue', zorder=3)
+#     ax.yaxis.set_major_locator(MaxNLocator(integer=True))
+#     ax.get_legend().remove()
+#     plt.title("{} - {}(0x{}) / by {}".format(status_df['ChargerId'][0], status_df['exp'][0], mt, opt), fontdict={'size':'medium'})
+#     plt.xticks(fontsize=7)
+#     plt.yticks(fontsize=7)
+#     plt.xlabel("RegDt", fontdict={'size':'small'})
+#     plt.ylabel("Count", fontdict={'size':'small'})
+#     plt.grid(True, axis='y', linestyle='dashed')
+#     plt.tight_layout()
+#     plt.show()
+#     return cnt1
+
+
+
+def msg_period_statistics(df, mt):
+    print("Access Request Communication\nmonthly, daily, hourly statistics\n")
     status_df = df[df['mt'] == mt].reset_index(drop=True)
     print("{} / mt: {}".format(status_df['exp'][0], mt))
-    cnt = status_df.groupby(status_df['RegDt'].dt.strftime('%m-%d'))['RegDt'].count()
-    cnt1 = cnt.to_frame()
-    ax = cnt1.plot(kind='bar', figsize=(6, 3), color='salmon', zorder=3)
-    ax.yaxis.set_major_locator(MaxNLocator(integer=True))
-    ax.get_legend().remove()
-    plt.title("{} / mt: {}".format(status_df['exp'][0], mt), fontdict={'size':'medium'})
-    plt.xticks(fontsize=7)
-    plt.yticks(fontsize=7)
-    plt.xlabel("RegDt", fontdict={'size':'small'})
-    plt.ylabel("count", fontdict={'size':'small'})
-    plt.grid(True, axis='y', linestyle='dashed')
+
+    df1 = pd.DataFrame(status_df.groupby(status_df['RegDt'].dt.strftime('%m'))['RegDt'].count())
+    df2 = pd.DataFrame(status_df.groupby(status_df['RegDt'].dt.strftime('%m-%d'))['RegDt'].count())
+    df3 = pd.DataFrame(status_df.groupby(status_df['RegDt'].dt.strftime('%H'))['RegDt'].count())
+
+    fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(8, 8))
+    sns.barplot(x=df1.index, y=df1['RegDt'], color='cornflowerblue', zorder=3, ax=ax1)
+    sns.barplot(x=df2.index, y=df2['RegDt'], color='gold', zorder=3, ax=ax2)
+    sns.barplot(x=df3.index, y=df3['RegDt'], color='plum', zorder=3, ax=ax3)
+
+    ax1.set(xlabel="RegDt", ylabel="Count", title="monthly Count")
+    ax2.set(xlabel="RegDt", ylabel="Count", title="by daily Count")
+    ax3.set(xlabel="RegDt", ylabel="Count", title="by hourly Count")
+    ax1.set_xticklabels(ax1.get_xticklabels(), rotation=90)
+    ax2.set_xticklabels(ax2.get_xticklabels(), rotation=90)
+    ax3.set_xticklabels(ax3.get_xticklabels(), rotation=90)
+    ax1.yaxis.set_major_locator(MaxNLocator(integer=True))
+    ax2.yaxis.set_major_locator(MaxNLocator(integer=True))
+    ax3.yaxis.set_major_locator(MaxNLocator(integer=True))
+    ax1.grid(True, axis='y', linestyle='dashed')
+    ax2.grid(True, axis='y', linestyle='dashed')
+    ax3.grid(True, axis='y', linestyle='dashed')
+    fig.suptitle("{} - {}(0x{})".format(status_df['ChargerId'][0], status_df['exp'][0], mt))
     plt.tight_layout()
     plt.show()
-    return cnt1
+    return df1, df2, df3
 
 
-# status_df = mt_info[mt_info['mt'] == '16'].reset_index(drop=True)
-# print("mt: {} / {}".format('16', status_df['exp'][0]))
-# cnt = status_df.groupby(status_df['RegDt'].dt.strftime('%m-%d %H'))['RegDt'].count()
-# cnt1 = cnt.to_frame()
+m = msg_period_statistics(msg_sequence, '05')[0]
+d = msg_period_statistics(msg_sequence, '05')[1]
+h = msg_period_statistics(msg_sequence, '05')[2]
 
-ds_charging(mt_info, '16')
-ds_charging(mt_info, '05')
+
+msg_period_statistics(msg_sequence, '16')
+msg_period_statistics(msg_sequence, '15')
+
+
+# a = get_date(csr, '202107211013', 12, opt='min')

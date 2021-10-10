@@ -50,9 +50,14 @@ ds_error = stat.show_device_status(dsr, 'Error')
 ds_cable_error = stat.show_device_status(dsr, '충전케이블 연결오류')
 ds_emergency = stat.show_device_status(dsr, '비상버튼 작동')
 
+ds_cable_error['RegDt']
+
+v = dsr[dsr["DeviceStatus"]=='충전케이블 연결오류']
+
+t = stat.get_date(dsr, '202107211013', 13, 'min')
+t1 = t[t['DeviceStatus']=='충전케이블 연결오류']
 
 dsr_charging = dsr.loc[dsr['DeviceStatus'] == 'Charging'].reset_index(drop=True)
-
 
 
 # stat.show_density(csr, 'AccumulatedWatt')
@@ -61,4 +66,6 @@ dsr_charging = dsr.loc[dsr['DeviceStatus'] == 'Charging'].reset_index(drop=True)
 # stat.show_variable_relation(t, 'RegDt', 'ChargeCurrent', 'AccumulatedWatt')
 
 # stat.show_feature_correlation(csr, 'RegDt', 'AccumulatedWatt')
+
+
 

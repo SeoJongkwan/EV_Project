@@ -4,6 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib.ticker import MaxNLocator
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
 plt.rc('font', family='AppleGothic', size=10)
 plt.rc('axes', unicode_minus=False)
@@ -47,9 +49,10 @@ def show_device_status(df, status):
     status_df = df[df['DeviceStatus']==status].reset_index(drop=True)
     print("-DeviceStatus:", status)
     print("-ChargerNumber:", status_df['ChargerNumber'].unique())
-    cnt = status_df.groupby(df['RegDt'].dt.strftime('%m-%d %H:%M'))['RegDt'].count()
-    cnt1 = cnt.to_frame()
-    ax = cnt1.plot(kind='bar', figsize=(5, 3), zorder=3, color='salmon')
+    cnt = status_df.groupby(status_df['RegDt'].dt.strftime('%m-%d %H:%M'))['RegDt'].count()
+    cnt1 = cnt.to_frame(name="count")
+    cnt2 = cnt1.reset_index()
+    ax = cnt1.plot(kind='bar', figsize=(7, 3), zorder=3, color='gold')
     ax.yaxis.set_major_locator(MaxNLocator(integer=True))
     ax.get_legend().remove()
     plt.title("Count Device Status: {} / {} times".format(status, len(cnt1)), fontdict={'size':'medium'})
@@ -60,7 +63,7 @@ def show_device_status(df, status):
     plt.grid(True, axis='y', linestyle='dashed')
     plt.tight_layout()
     plt.show()
-    return cnt
+    return cnt2
 
 
 def show_feature_correlation(df, time, col):
@@ -117,3 +120,33 @@ def show_density(df, col):
     plt.tight_layout()
     plt.show()
 
+
+def get_date(df, start, time, opt='day'):
+    year = int(start[:4])
+    month = int(start[4:6])
+    day = int(start[6:8])
+    hour = int(start[8:10])
+    min = int(start[10:12])
+    s = datetime(year, month, day, hour, min)
+    if opt == 'month':
+        delta = datetime(year, month, day, hour, min) + relativedelta(months=time)
+        df1 = df[(df['RegDt'] > s) & (df['RegDt'] < delta)].reset_index(drop=True)
+        print("duration: {} ~ {}".format(s, delta))
+        return df1
+    elif opt == 'day':
+        delta = datetime(year, month, day, hour, min) + relativedelta(days=time)
+        df1 = df[(df['RegDt'] > s) & (df['RegDt'] < delta)].reset_index(drop=True)
+        print("duration: {} ~ {}".format(s, delta))
+        return df1
+    elif opt == 'hour':
+        delta = datetime(year, month, day, hour, min) + relativedelta(hours=time)
+        df1 = df[(df['RegDt'] > s) & (df['RegDt'] < delta)].reset_index(drop=True)
+        print("duration: {} ~ {}".format(s, delta))
+        return df1
+    elif opt == 'min':
+        delta = datetime(year, month, day, hour, min) + relativedelta(minutes=time)
+        df1 = df[(df['RegDt'] > s) & (df['RegDt'] < delta)].reset_index(drop=True)
+        print("duration: {} ~ {}".format(s, delta))
+        return df1
+    else:
+        print("check opt select")
