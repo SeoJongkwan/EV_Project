@@ -1,6 +1,5 @@
 import pandas as pd
 import os
-import argparse
 import psycopg2
 import configparser
 import argparse

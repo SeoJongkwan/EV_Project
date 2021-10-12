@@ -5,8 +5,9 @@ import numpy as np
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 import seaborn as sns
+import statistics as stat   #statistics function module
+import chart                #chart function module
 
-import statistics as stat       #statistics function module
 
 path = os.path.join(os.path.dirname(__file__), 'data/')
 parser = argparse.ArgumentParser()
@@ -36,7 +37,6 @@ csr_ack = csr_ack.copy()
 csr_ack['RegDt'] = pd.to_datetime(csr_ack['RegDt'], format='%Y-%m-%d %H:%M:%S')
 
 
-
 #delete NAN data
 dsr = stat.check_nan_value(dsr)
 csr = stat.check_nan_value(csr)
@@ -44,11 +44,11 @@ csr_ack = stat.check_nan_value(csr_ack)
 
 #Device Status Code
 print("\n-Device Status Type Count")
-dsr_status_cnt = stat.show_value_cnt(dsr, "DeviceStatus")
+dsr_status_cnt = chart.show_value_cnt(dsr, "DeviceStatus")
 #Device Status Code --> Error
-ds_error = stat.show_device_status(dsr, 'Error')
-ds_cable_error = stat.show_device_status(dsr, '충전케이블 연결오류')
-ds_emergency = stat.show_device_status(dsr, '비상버튼 작동')
+ds_error = chart.show_device_status(dsr, 'Error')
+ds_cable_error = chart.show_device_status(dsr, '충전케이블 연결오류')
+ds_emergency = chart.show_device_status(dsr, '비상버튼 작동')
 
 ds_cable_error['RegDt']
 
@@ -60,12 +60,12 @@ t1 = t[t['DeviceStatus']=='충전케이블 연결오류']
 dsr_charging = dsr.loc[dsr['DeviceStatus'] == 'Charging'].reset_index(drop=True)
 
 
-# stat.show_density(csr, 'AccumulatedWatt')
+# chart.show_density(csr, 'AccumulatedWatt')
 
 # t = csr.loc[csr['RegDt'].dt.month == 7]
-# stat.show_variable_relation(t, 'RegDt', 'ChargeCurrent', 'AccumulatedWatt')
+# chart.show_variable_relation(t, 'RegDt', 'ChargeCurrent', 'AccumulatedWatt')
 
-# stat.show_feature_correlation(csr, 'RegDt', 'AccumulatedWatt')
+# chart.show_feature_correlation(csr, 'RegDt', 'AccumulatedWatt')
 
 
 

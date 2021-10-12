@@ -1,8 +1,7 @@
 import pandas as pd
-import numpy as np
 import argparse
 import os
-import datetime
+import re
 
 pd.set_option('mode.chained_assignment', None) # SettingWithCopyWarning
 
@@ -19,6 +18,9 @@ print("\ncolumn name change: kor --> eng")
 user_col = ['SID', 'time', 'charger', 'AS', 'chargerNo', 'user', 'carNo', 'duration', 'AccumulatedWatt',
             'chargingFee', 'payment', 'payMethod', 'roaming', 'roamingNo', 'status', 'chargerStatus']
 user_file.columns = user_col
+
+print("user column char remove")
+user_file['user'] = [re.sub('[()가-힣]', '', s) for s in user_file['user']]
 
 print('time column split --> start & end')
 user_file.insert(1, 'start', user_file['time'].str.split('~').str[0])
