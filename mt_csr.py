@@ -89,15 +89,15 @@ def data_convert(target, df):
     pd.set_option('mode.chained_assignment', None)
     cc = []
     for k in df['ChargeCurrent'].to_numpy():
-        cc.append(int([k][0], 16) * 10 / 1000)       #10mA
+        cc.append((int([k][0], 16) * 10 / 1000))   #10mA
     df['ChargeCurrent'] = cc
     cv = []
     for k in df['ChargeVoltage'].to_numpy():
-        cv.append(int([k][0], 16) * 10 / 1000)       #100mV
+        cv.append((int([k][0], 16) * 10 / 1000))       #100mV
     df['ChargeVoltage'] = cv
     aw = []
     for k in df['AccumulatedWatt'].to_numpy():
-        aw.append(int([k][0], 16) * 10 / 1000)       #1000mWh
+        aw.append((int([k][0], 16) * 10 / 1000))       #1000mWh
     df['AccumulatedWatt'] = aw
     for k in range(len(df)):
         df['AccessId'][k] = int((df['AccessId'][k]), 16)
@@ -117,6 +117,11 @@ data_convert(csr_original, csr_parsing)
 csr_parsing['Send'] = csr_mt['Send'].copy()
 csr_parsing['msgId'] = csr_mt['msgId'].copy()
 csr_parsing.insert(0, 'RegDt', csr_mt['RegDt'].copy())
+# csr_parsing['InstantaneousPower'] = round((csr_parsing['ChargeCurrent']*csr_parsing['ChargeVoltage'])/1000,2)
+# ip = []
+# for k in csr_parsing['InstantaneousPower'].to_numpy():
+#     ip.append(format(k, ".2f"))
+# csr_parsing['InstantaneousPower'] = ip
 
 save_file = "dc_100kW_csr.csv"
 print("Save File: {}".format(save_file))

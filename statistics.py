@@ -28,7 +28,7 @@ dsr = dsr.copy()
 dsr['RegDt'] = pd.to_datetime(dsr['RegDt'], format='%Y-%m-%d %H:%M:%S')
 
 csr_file = pd.read_csv(args.data_path + "dc_100kW_csr.csv")
-csr_cols = ['RegDt','ChargerId','ChargeCurrent','ChargeVoltage','AccumulatedWatt','ChargerNumber']
+csr_cols = ['RegDt','ChargerId','ChargeCurrent','ChargeVoltage','InstantaneousPower','AccumulatedWatt','ChargerNumber']
 csr = csr_file[csr_cols]
 csr = csr.copy()
 csr['RegDt'] = pd.to_datetime(csr['RegDt'], format='%Y-%m-%d %H:%M:%S')
@@ -160,15 +160,13 @@ show_value_cnt(user_file, 'user')
 
 
 b = user_file.groupby([user_file['user'], user_file['start'].dt.strftime('%m-%d %H')]).count()
-b.reset_index()
-
-pd.pivot_table(user_file, 'user', user_file['start'].dt.strftime('%m-%d %H'), aggfunc='count')
 
 
 
-user_cnt = pd.DataFrame(user_file.groupby(user_file['start'].dt.strftime('%m-%d %H'))['user'].count())
-plt.figure(figsize=(15,5))
-plt.xticks(rotation=90)
-sns.barplot(x=b.index, y=b['user'], color='cornflowerblue', zorder=3)
-plt.tight_layout()
-plt.show()
+
+# user_cnt = pd.DataFrame(user_file.groupby(user_file['start'].dt.strftime('%m-%d %H'))['user'].count())
+# plt.figure(figsize=(15,5))
+# plt.xticks(rotation=90)
+# sns.barplot(x=b.index, y=b['user'], color='cornflowerblue', zorder=3)
+# plt.tight_layout()
+# plt.show()
