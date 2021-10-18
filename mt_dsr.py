@@ -1,23 +1,24 @@
 import pandas as pd
 import argparse
 import os
-import numpy as np
 from tqdm import tqdm
-import matplotlib.pyplot as plt
-import seaborn as sns
-from common import Data         #common class
 
-plt.rcParams["font.family"] = "NanumBarunGothic"
+from common import Data         #common module
+import statistics as stat       #statistics module
 
 path = os.path.join(os.path.dirname(__file__), 'data/')
 parser = argparse.ArgumentParser()
-parser.add_argument('--data_path', default=path, help = "path to input file")
+parser.add_argument('--data_path', default=path, help="path to input file")
 args = parser.parse_args()
 
-file_name = "dc_100kW.csv"
-file = Data(args.data_path + file_name)
+file = Data()
+print("File List: {}".format(file.file_name))
+select_file = file.file_name[4]
+print("Select File: {}".format(select_file))
+file_path = args.data_path + select_file + ".csv"
+
 msg_type = file.msg_type()      #message type
-data = file.read_file()
+data = file.read_file(file_path)
 msg_index = file.structure()    #header, body index location in msg
 
 #select message type
@@ -91,7 +92,10 @@ dsr_parsing['Send'] = dsr_mt['Send'].copy()
 dsr_parsing['msgId'] = dsr_mt['msgId'].copy()
 dsr_parsing.insert(0, 'RegDt', dsr_mt['RegDt'].copy())
 
-save_file = "dc_100kW_dsr.csv"
+stat.convert_datetime(dsr_parsing)
+
+
+save_file = select_file + "_dsr.csv"
 print("Save File: {}".format(save_file))
 dsr_parsing.to_csv(args.data_path + save_file, index=False)
 

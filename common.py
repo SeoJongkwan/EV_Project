@@ -4,13 +4,13 @@ class Data:
     base_index = []
     type = {}
 
-    def __init__(self, file_name):
-        self.file_name = file_name
+    def __init__(self):
+        self.file_name = ["dc_100kW_인덕원IT밸리_210721_210827", "dc_50kW_광주보건환경연구원_210906_211015", "dc_50kW_국민차매매단지공항점_210906_211015",
+                          "dc_50kW_해오름휴게소_210906_211015", "dc_50kW_현대이엔지세종사옥_210906_211015"]
 
-    def read_file(self):
-        file = pd.read_csv(self.file_name)
+    def read_file(self, name):
+        file = pd.read_csv(name)
         file['msg'] = file['msg'].str.replace(' ', '')
-        print("file: {}".format(self.file_name))
         return file
 
     # structure: name[length:data]

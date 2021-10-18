@@ -2,23 +2,28 @@ import pandas as pd
 import argparse
 import os
 from tqdm import tqdm
-from common import Data         #common class
+
+import statistics as stat       #statistics module
+from common import Data         #common module
 
 path = os.path.join(os.path.dirname(__file__), 'data/')
 parser = argparse.ArgumentParser()
 parser.add_argument('--data_path', default=path, help = "path to input file")
 args = parser.parse_args()
 
-file_name = "dc_100kW.csv"
-file = Data(args.data_path + file_name)
+file = Data()
+print("File List: {}".format(file.file_name))
+select_file = file.file_name[4]
+print("Select File: {}".format(select_file))
+file_path = args.data_path + select_file + ".csv"
+
 msg_type = file.msg_type()      #message type
-data = file.read_file()
+data = file.read_file(file_path)
 msg_index = file.structure()    #header, body index location in msg
 
 #select message type
 mt = '05'
 ar_mt = file.select_mt(data, mt)
-# ar_mt.to_csv(args.data_path + "dc_100kW_mt_{}.csv".format(mt), index=False)
 
 #data name:[length, data, value_length]
 ar_struct = {'AccessId':[1,'0x09',4],'RequireCurrent':[1,'0x18',1],'RequireWatt':[1,'0x20',3],
@@ -108,8 +113,9 @@ print("Data Convert:\n AccessId, RequireCurrent, RequireWatt, ChargingTime, Star
 ar_parsing = data_convert(ar_parsing)
 
 ar_parsing.insert(0, 'RegDt', ar_mt['RegDt'].copy())
+stat.convert_datetime(ar_parsing)
 
-save_file = "dc_100kW_ar.csv"
+save_file = select_file + "_ar.csv"
 print("Save File: {}".format(save_file))
 ar_parsing.to_csv(args.data_path + save_file, index=False)
 

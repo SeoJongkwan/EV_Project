@@ -13,19 +13,12 @@ plt.rc('xtick', labelsize=10)
 plt.rc('ytick', labelsize=10)
 
 
-def show_value_cnt(df, col):
-    '''
-    :param df: field unique value count
-    :param col: selection field
-    :return: series&chart field unique value count
-    '''
+def show_value_cnt(df, file, col):
     value_count = df[col].value_counts()
-    df[col].value_counts().plot(kind='barh', figsize=(10, 5))
+    df[col].value_counts().plot(kind='barh', color='navy', figsize=(10, 5))
     for i, v in enumerate(value_count):
         plt.text(v+10, i, str(v), fontweight='bold')
-    start = str(df.iloc[0, 0])[:-9]
-    end = str(df.iloc[-1, 0])[:-9]
-    plt.title('{} Value Count: {} ~ {}'.format(col, start, end))
+    plt.title('{} / {} Info'.format(file, col))
     plt.grid(True, axis='x')
     plt.tight_layout()
     plt.show()
@@ -105,6 +98,38 @@ def show_density(df, col):
     ax2.set(xlabel=col, ylabel='density', title='{} Disribution Density'.format(col))
     plt.tight_layout()
     plt.show()
+
+
+def show_msg_period_statistics(df, file, mt):
+    print("Access Request Communication\nmonthly, daily, hourly statistics\n")
+    status_df = df[df['mt'] == mt].reset_index(drop=True)
+    print("{} / mt: {}".format(status_df['exp'][0], mt))
+
+    df1 = pd.DataFrame(status_df.groupby(status_df['RegDt'].dt.strftime('%m'))['RegDt'].count())
+    df2 = pd.DataFrame(status_df.groupby(status_df['RegDt'].dt.strftime('%m-%d'))['RegDt'].count())
+    df3 = pd.DataFrame(status_df.groupby(status_df['RegDt'].dt.strftime('%H'))['RegDt'].count())
+
+    fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(8, 8))
+    sns.barplot(x=df1.index, y=df1['RegDt'], color='cornflowerblue', zorder=3, ax=ax1)
+    sns.barplot(x=df2.index, y=df2['RegDt'], color='gold', zorder=3, ax=ax2)
+    sns.barplot(x=df3.index, y=df3['RegDt'], color='plum', zorder=3, ax=ax3)
+
+    ax1.set(xlabel="RegDt", ylabel="Count", title="monthly Count")
+    ax2.set(xlabel="RegDt", ylabel="Count", title="by daily Count")
+    ax3.set(xlabel="RegDt", ylabel="Count", title="by hourly Count")
+    ax1.set_xticklabels(ax1.get_xticklabels(), rotation=90)
+    ax2.set_xticklabels(ax2.get_xticklabels(), rotation=90)
+    ax3.set_xticklabels(ax3.get_xticklabels(), rotation=90)
+    ax1.yaxis.set_major_locator(MaxNLocator(integer=True))
+    ax2.yaxis.set_major_locator(MaxNLocator(integer=True))
+    ax3.yaxis.set_major_locator(MaxNLocator(integer=True))
+    ax1.grid(True, axis='y', linestyle='dashed')
+    ax2.grid(True, axis='y', linestyle='dashed')
+    ax3.grid(True, axis='y', linestyle='dashed')
+    fig.suptitle("{}({}) / {}".format(file, status_df['ChargerId'][0], status_df['exp'][0]))
+    plt.tight_layout()
+    plt.show()
+    return df1, df2, df3
 
 
 

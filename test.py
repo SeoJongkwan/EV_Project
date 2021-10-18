@@ -32,29 +32,30 @@ args = parser.parse_args()
 # con = psycopg2.connect(host=host, dbname=dbname, user=user, password=password, port=port)
 # cursor = con.cursor()
 
-ar_file = pd.read_csv(args.data_path + "dc_100kW_ar.csv")
-ar_cols = ['RegDt','ServerId','ChargerId','AccessId','RequireCurrent','RequireWatt','ChargingTime']
-ar = ar_file[ar_cols]
-ar = ar.copy()
-ar['RegDt'] = pd.to_datetime(ar['RegDt'], format='%Y-%m-%d %H:%M:%S')
+# ar_file = pd.read_csv(args.data_path + "dc_100kW_ar.csv")
+# ar_cols = ['RegDt','ServerId','ChargerId','AccessId','RequireCurrent','RequireWatt','ChargingTime']
+# ar = ar_file[ar_cols]
+# ar = ar.copy()
+# ar['RegDt'] = pd.to_datetime(ar['RegDt'], format='%Y-%m-%d %H:%M:%S')
 
 dsr_file = pd.read_csv(args.data_path + "dc_100kW_dsr.csv")
 dsr_cols = ['RegDt', 'ChargerId', 'DeviceStatus', 'AccessId', 'ChargerNumber']
 dsr = dsr_file[dsr_cols]
 dsr = dsr.copy()
-dsr['RegDt'] = pd.to_datetime(dsr['RegDt'], format='%Y-%m-%d %H:%M:%S')
+# dsr['RegDt'] = pd.to_datetime(dsr['RegDt'], format='%Y-%m-%d %H:%M:%S')
+dsr['RegDt'] = pd.to_datetime(dsr['RegDt'], format='%m/%d/%y %H:%M')    #dc_50kW_광주보건환경연구원_210906_211015.csv
 
-csr_file = pd.read_csv(args.data_path + "dc_100kW_csr.csv")
-csr_cols = ['RegDt','ChargerId','ChargeCurrent','ChargeVoltage','AccumulatedWatt','ChargerNumber']
-csr = csr_file[csr_cols]
-csr = csr.copy()
-csr['RegDt'] = pd.to_datetime(csr['RegDt'], format='%Y-%m-%d %H:%M:%S')
+# csr_file = pd.read_csv(args.data_path + "dc_100kW_csr.csv")
+# csr_cols = ['RegDt','ChargerId','ChargeCurrent','ChargeVoltage','AccumulatedWatt','ChargerNumber']
+# csr = csr_file[csr_cols]
+# csr = csr.copy()
+# csr['RegDt'] = pd.to_datetime(csr['RegDt'], format='%Y-%m-%d %H:%M:%S')
 
-original_file = pd.read_csv(args.data_path + "dc_100kW.csv")
+original_file = pd.read_csv(args.data_path + "dc_100kW_인덕원IT밸리_210721_210827.csv")
 
-user_file = pd.read_csv(args.data_path + 'dc_100kW_user.csv', encoding='UTF8')
+# user_file = pd.read_csv(args.data_path + 'dc_100kW_user.csv', encoding='UTF8')
 
-file_name = "dc_100kW.csv"
+file_name = "dc_100kW_인덕원IT밸리_210721_210827.csv"
 common_obj = Data(args.data_path + file_name)
 
 def sequence_mt(file):
@@ -83,31 +84,31 @@ msg_sequence['mt'].unique()
 msg_sequence['exp'].value_counts().sum()
 
 
-#
-# def ds_charging(df, mt, opt='day'):
-#     status_df = df[df['mt'] == mt].reset_index(drop=True)
-#     print("{} / mt: {}".format(status_df['exp'][0], mt))
-#     cnt = pd.DataFrame()
-#     if opt == 'month':
-#         cnt = status_df.groupby(status_df['RegDt'].dt.strftime('%m'))['RegDt'].count()
-#     elif opt == 'day':
-#         cnt = status_df.groupby(status_df['RegDt'].dt.strftime('%m-%d'))['RegDt'].count()
-#     elif opt == 'hour':
-#         cnt = status_df.groupby(status_df['RegDt'].dt.strftime('%H'))['RegDt'].count()
-#
-#     cnt1 = cnt.to_frame()
-#     ax = cnt1.plot(kind='bar', figsize=(6, 3), color='cornflowerblue', zorder=3)
-#     ax.yaxis.set_major_locator(MaxNLocator(integer=True))
-#     ax.get_legend().remove()
-#     plt.title("{} - {}(0x{}) / by {}".format(status_df['ChargerId'][0], status_df['exp'][0], mt, opt), fontdict={'size':'medium'})
-#     plt.xticks(fontsize=7)
-#     plt.yticks(fontsize=7)
-#     plt.xlabel("RegDt", fontdict={'size':'small'})
-#     plt.ylabel("Count", fontdict={'size':'small'})
-#     plt.grid(True, axis='y', linestyle='dashed')
-#     plt.tight_layout()
-#     plt.show()
-#     return cnt1
+
+def ds_charging(df, mt, opt='day'):
+    status_df = df[df['mt'] == mt].reset_index(drop=True)
+    print("{} / mt: {}".format(status_df['exp'][0], mt))
+    cnt = pd.DataFrame()
+    if opt == 'month':
+        cnt = status_df.groupby(status_df['RegDt'].dt.strftime('%m'))['RegDt'].count()
+    elif opt == 'day':
+        cnt = status_df.groupby(status_df['RegDt'].dt.strftime('%m-%d'))['RegDt'].count()
+    elif opt == 'hour':
+        cnt = status_df.groupby(status_df['RegDt'].dt.strftime('%H'))['RegDt'].count()
+
+    cnt1 = cnt.to_frame()
+    ax = cnt1.plot(kind='bar', figsize=(6, 3), color='cornflowerblue', zorder=3)
+    ax.yaxis.set_major_locator(MaxNLocator(integer=True))
+    ax.get_legend().remove()
+    plt.title("{} - {}(0x{}) / by {}".format(status_df['ChargerId'][0], status_df['exp'][0], mt, opt), fontdict={'size':'medium'})
+    plt.xticks(fontsize=7)
+    plt.yticks(fontsize=7)
+    plt.xlabel("RegDt", fontdict={'size':'small'})
+    plt.ylabel("Count", fontdict={'size':'small'})
+    plt.grid(True, axis='y', linestyle='dashed')
+    plt.tight_layout()
+    plt.show()
+    return cnt1
 
 
 

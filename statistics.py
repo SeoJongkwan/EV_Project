@@ -7,7 +7,6 @@ from matplotlib.ticker import MaxNLocator
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
-import chart
 from common import Data
 
 path = os.path.join(os.path.dirname(__file__), 'data/')
@@ -15,37 +14,47 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--data_path', default=path, help = "path to input file")
 args = parser.parse_args()
 
-ar_file = pd.read_csv(args.data_path + "dc_100kW_ar.csv")
-ar_cols = ['RegDt','ServerId','ChargerId','AccessId','RequireCurrent','RequireWatt','ChargingTime']
-ar = ar_file[ar_cols]
-ar = ar.copy()
-ar['RegDt'] = pd.to_datetime(ar['RegDt'], format='%Y-%m-%d %H:%M:%S')
+file = Data()
+print("File List: {}".format(file.file_name))
+select_file = file.file_name[2]
+print("Select File: {}".format(select_file))
+file_path = args.data_path + select_file
+#
+# ar_file = pd.read_csv(file_path + "_ar.csv")
+# ar_cols = ['RegDt','ServerId','ChargerId','AccessId','RequireCurrent','RequireWatt','ChargingTime']
+# ar = ar_file[ar_cols]
+# ar = ar.copy()
+# ar['RegDt'] = pd.to_datetime(ar['RegDt'], format='%Y-%m-%d %H:%M:%S')
+#
+# dsr_file = pd.read_csv(file_path + "_dsr.csv")
+# dsr_cols = ['RegDt', 'ChargerId', 'DeviceStatus', 'AccessId', 'ChargerNumber']
+# dsr = dsr_file[dsr_cols]
+# dsr = dsr.copy()
+# # dsr['RegDt'] = pd.to_datetime(dsr['RegDt'], format='%Y-%m-%d %H:%M:%S')
+#
+# csr_file = pd.read_csv(file_path + "_csr.csv")
+# csr_cols = ['RegDt','ChargerId','ChargeCurrent','ChargeVoltage','InstantaneousPower','AccumulatedWatt','ChargerNumber']
+# csr = csr_file[csr_cols]
+# csr = csr.copy()
+# csr['RegDt'] = pd.to_datetime(csr['RegDt'], format='%Y-%m-%d %H:%M:%S')
+#
 
-dsr_file = pd.read_csv(args.data_path + "dc_100kW_dsr.csv")
-dsr_cols = ['RegDt', 'ChargerId', 'DeviceStatus', 'AccessId', 'ChargerNumber']
-dsr = dsr_file[dsr_cols]
-dsr = dsr.copy()
-dsr['RegDt'] = pd.to_datetime(dsr['RegDt'], format='%Y-%m-%d %H:%M:%S')
+def convert_datetime(df):
+    try:
+        datetime.strptime(df['RegDt'][0], '%Y-%m-%d %H:%M:%S')
+        df['RegDt'] = pd.to_datetime(df['RegDt'], format='%Y-%m-%d %H:%M:%S')
+        return df
+    except ValueError:
+        print("datetime format --> %Y-%m-%d %H:%M:%S")
+        datetime.strptime(df['RegDt'][0], '%m/%d/%y %H:%M')
+        df['RegDt'] = pd.to_datetime(df['RegDt'], format='%m/%d/%y %H:%M')
+        return df
 
-csr_file = pd.read_csv(args.data_path + "dc_100kW_csr.csv")
-csr_cols = ['RegDt','ChargerId','ChargeCurrent','ChargeVoltage','InstantaneousPower','AccumulatedWatt','ChargerNumber']
-csr = csr_file[csr_cols]
-csr = csr.copy()
-csr['RegDt'] = pd.to_datetime(csr['RegDt'], format='%Y-%m-%d %H:%M:%S')
 
-original_file = pd.read_csv(args.data_path + "dc_100kW.csv")
-
-user_file = pd.read_csv(args.data_path + 'dc_100kW_user.csv', encoding='UTF8')
-user_file['start'] = pd.to_datetime(user_file['start'], format='%Y-%m-%d %H:%M:%S')
-
-file_name = "dc_100kW.csv"
-common_obj = Data(args.data_path + file_name)
+# user_file = pd.read_csv(file_path + '_user.csv', encoding='UTF8')
+# user_file['start'] = pd.to_datetime(user_file['start'], format='%Y-%m-%d %H:%M:%S')
 
 def check_nan_value(df):
-    '''
-    :param df: NAN value check
-    :return: df except NAN value
-    '''
     print('Check NAN Value on Each Column:\n{}'.format(df.isnull().sum()))
     series = df.isnull().sum()
     for value in series.values:
@@ -56,8 +65,8 @@ def check_nan_value(df):
             return df1
     return df
 
-def sequence_mt(file):
-    file1 = file.copy()
+def sequence_mt(f):
+    file1 = f.copy()
     file1['msg'] = file1['msg'].str.replace(' ', '')
 
     mt = []
@@ -65,7 +74,7 @@ def sequence_mt(file):
         mt.append(type[18:20])
     file1['mt'] = mt
 
-    msg_type = common_obj.msg_type()
+    msg_type = file.msg_type()
     exp = []
     file1['exp'] = None
     for type in file1['mt']:
@@ -137,15 +146,16 @@ def msg_period_statistics(df, mt):
     plt.show()
     return df1, df2, df3
 
+original_file = pd.read_csv(file_path + ".csv")
+original_file = convert_datetime(original_file)
 
 msg_sequence = sequence_mt(original_file)
-msg_sequence['RegDt'] = pd.to_datetime(msg_sequence['RegDt'], format='%Y-%m-%d %H:%M:%S')
 msg_sequence['mt'].unique()
 msg_sequence['exp'].value_counts().sum()
 
-msg_period_statistics(msg_sequence, '05')[0]
+msg_period_statistics(msg_sequence, '05')
 
-user_file['user'].value_counts
+# user_file['user'].value_counts
 
 def show_value_cnt(df, col):
     value_count = df[col].value_counts()
@@ -156,10 +166,10 @@ def show_value_cnt(df, col):
     plt.show()
     return value_count
 
-show_value_cnt(user_file, 'user')
+# show_value_cnt(user_file, 'user')
 
 
-b = user_file.groupby([user_file['user'], user_file['start'].dt.strftime('%m-%d %H')]).count()
+# b = user_file.groupby([user_file['user'], user_file['start'].dt.strftime('%m-%d %H')]).count()
 
 
 

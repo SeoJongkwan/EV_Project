@@ -2,23 +2,29 @@ import pandas as pd
 import argparse
 import os
 from tqdm import tqdm
+
 from common import Data         #common class
+import statistics as stat       #statistics module
+
 
 path = os.path.join(os.path.dirname(__file__), 'data/')
 parser = argparse.ArgumentParser()
 parser.add_argument('--data_path', default=path, help = "path to input file")
 args = parser.parse_args()
 
-file_name = "dc_100kW.csv"
-file = Data(args.data_path + file_name)
+file = Data()
+print("File List: {}".format(file.file_name))
+select_file = file.file_name[4]
+print("Select File: {}".format(select_file))
+file_path = args.data_path + select_file + ".csv"
+
 msg_type = file.msg_type()      #message type
-data = file.read_file()
+data = file.read_file(file_path)
 msg_index = file.structure()    #header, body index location in msg
 
 #select message type
 mt = '16'
 csr_mt = file.select_mt(data, mt)
-# csr_mt.to_csv(args.data_path + "dc_100kW_mt_{}.csv".format(mt), index=False)
 
 #data name:[length, data, value_length]
 csr_struct = {'ChargeCurrent':[1,'0x02',2],'ChargeVoltage':[1,'0x03',2],'Temperature':[1,'0x04',1],
@@ -117,12 +123,14 @@ data_convert(csr_original, csr_parsing)
 csr_parsing['Send'] = csr_mt['Send'].copy()
 csr_parsing['msgId'] = csr_mt['msgId'].copy()
 csr_parsing.insert(0, 'RegDt', csr_mt['RegDt'].copy())
-# csr_parsing['InstantaneousPower'] = round((csr_parsing['ChargeCurrent']*csr_parsing['ChargeVoltage'])/1000,2)
-# ip = []
-# for k in csr_parsing['InstantaneousPower'].to_numpy():
-#     ip.append(format(k, ".2f"))
-# csr_parsing['InstantaneousPower'] = ip
+csr_parsing['InstantaneousPower'] = round((csr_parsing['ChargeCurrent']*csr_parsing['ChargeVoltage'])/1000,2)
+ip = []
+for k in csr_parsing['InstantaneousPower'].to_numpy():
+    ip.append(format(k, ".2f"))
+csr_parsing['InstantaneousPower'] = ip
 
-save_file = "dc_100kW_csr.csv"
+stat.convert_datetime(csr_parsing)
+
+save_file = select_file + "_csr.csv"
 print("Save File: {}".format(save_file))
 csr_parsing.to_csv(args.data_path + save_file, index=False)
