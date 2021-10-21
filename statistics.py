@@ -9,6 +9,8 @@ from dateutil.relativedelta import relativedelta
 
 from common import Data
 
+pd.set_option('mode.chained_assignment', None)
+
 path = os.path.join(os.path.dirname(__file__), 'data/')
 parser = argparse.ArgumentParser()
 parser.add_argument('--data_path', default=path, help = "path to input file")
@@ -77,9 +79,12 @@ def sequence_mt(f):
     msg_type = file.msg_type()
     exp = []
     file1['exp'] = None
-    for type in file1['mt']:
-        if type in msg_type.keys():
-            exp.append(msg_type[type][0])
+    for k in range(len(file1['mt'])):
+        if file1['mt'][k] not in msg_type.keys():
+            print("Not Defined mt:{}, index:{}".format(file1['mt'][k], k))
+            file1 = file1.drop(k)
+        else:
+            exp.append(msg_type[file1['mt'][k]][0])
     file1['exp'] = exp
     file2 = file1[['ChargerId','RegDt','mt','exp']]
     return file2
@@ -153,7 +158,7 @@ msg_sequence = sequence_mt(original_file)
 msg_sequence['mt'].unique()
 msg_sequence['exp'].value_counts().sum()
 
-msg_period_statistics(msg_sequence, '05')
+# msg_period_statistics(msg_sequence, '05')
 
 # user_file['user'].value_counts
 

@@ -13,7 +13,7 @@ parser.add_argument('--data_path', default=path, help = "path to input file")
 args = parser.parse_args()
 
 file = Data()
-select_file = file.file_name[4]
+select_file = file.file_name[1]
 print("Select File: {}".format(select_file))
 
 original_file = pd.read_csv(args.data_path + select_file + ".csv")
@@ -39,6 +39,7 @@ csr = stat.check_nan_value(csr)
 csr_ack = stat.check_nan_value(csr_ack)
 
 
+
 # chart.show_density(csr, 'AccumulatedWatt')
 
 t = csr.loc[csr['RegDt'].dt.month == 9]
@@ -53,27 +54,3 @@ msg_sequence['mt'].unique()
 msg_sequence['exp'].value_counts().sum()
 
 chart.show_msg_period_statistics(msg_sequence, select_file, '05')
-
-# file1 = original_file.copy()
-# file1['msg'] = file1['msg'].str.replace(' ', '')
-
-# mt = []
-# # file1['msg'][18:20]
-#
-# for type in file1['msg']:
-#     print(type)
-#     mt.append(type[18:20])
-# file1['mt'] = mt
-# #
-# msg_type = file.msg_type()
-# exp = []
-# file1['exp'] = None
-# file1['mt'].unique()
-#
-# file2 = file1[file1['mt']=='11']
-# # for type in file1['mt']:
-# #     if type in msg_type.keys():
-# #         print(type)
-# #         exp.append(msg_type[type][0])
-# # file1['exp'] = exp
-# # file2 = file1[['ChargerId', 'RegDt', 'mt', 'exp']]

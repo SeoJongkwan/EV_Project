@@ -7,6 +7,8 @@ from matplotlib.ticker import MaxNLocator
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
+pd.set_option('mode.chained_assignment', None)
+
 plt.rc('font', family='AppleGothic', size=10)
 plt.rc('axes', unicode_minus=False)
 plt.rc('xtick', labelsize=10)
@@ -43,6 +45,24 @@ def show_device_status(df, status):
     plt.tight_layout()
     plt.show()
     return cnt2
+
+
+def show_device_status_ratio(file, df, min=2):
+    df['percent'] = None
+    for i in range(len(df)):
+        s = df['DeviceStatus'].sum()
+        df['percent'][i] = round((df['DeviceStatus'][i] / s)*100, 2)
+        if df['percent'][i] < min:
+            print("Remove ({}%) - {}: {}times / {}%".format(min, df.index[i], df['DeviceStatus'][i], df['percent'][i]))
+    df1 = df[df['percent'] > min]
+    wedgeprops = {'width': 0.7, 'edgecolor': 'w', 'linewidth': 5}
+    colors = sns.color_palette('pastel')
+    plt.pie(df1['DeviceStatus'], labels=df1.index, autopct='%.1f%%', counterclock=False, colors=colors, wedgeprops=wedgeprops)
+    plt.title("{} / Device Status Ratio (>{}%)".format(file, min), fontdict={'size':'medium'})
+    # plt.axis('equal')
+    plt.tight_layout()
+    plt.show()
+    return df1
 
 
 def show_feature_correlation(df, time, col):
