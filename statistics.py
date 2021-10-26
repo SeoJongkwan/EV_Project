@@ -17,10 +17,10 @@ parser.add_argument('--data_path', default=path, help = "path to input file")
 args = parser.parse_args()
 
 file = Data()
-print("File List: {}".format(file.file_name))
-select_file = file.file_name[2]
-print("Select File: {}".format(select_file))
-file_path = args.data_path + select_file
+# print("File List: {}".format(file.file_name))
+# select_file = file.file_name[2]
+# print("Select File: {}".format(select_file))
+# file_path = args.data_path + select_file
 #
 # ar_file = pd.read_csv(file_path + "_ar.csv")
 # ar_cols = ['RegDt','ServerId','ChargerId','AccessId','RequireCurrent','RequireWatt','ChargingTime']
@@ -120,43 +120,43 @@ def get_date(df, start, time, opt='day'):
     else:
         print("check opt select")
 
-def msg_period_statistics(df, mt):
-    print("Access Request Communication\nmonthly, daily, hourly statistics\n")
-    status_df = df[df['mt'] == mt].reset_index(drop=True)
-    print("{} / mt: {}".format(status_df['exp'][0], mt))
+# def msg_period_statistics(df, mt):
+#     print("Access Request Communication\nmonthly, daily, hourly statistics\n")
+#     status_df = df[df['mt'] == mt].reset_index(drop=True)
+#     print("{} / mt: {}".format(status_df['exp'][0], mt))
+#
+#     df1 = pd.DataFrame(status_df.groupby(status_df['RegDt'].dt.strftime('%m'))['RegDt'].count())
+#     df2 = pd.DataFrame(status_df.groupby(status_df['RegDt'].dt.strftime('%m-%d'))['RegDt'].count())
+#     df3 = pd.DataFrame(status_df.groupby(status_df['RegDt'].dt.strftime('%H'))['RegDt'].count())
+#
+#     fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(8, 8))
+#     sns.barplot(x=df1.index, y=df1['RegDt'], color='cornflowerblue', zorder=3, ax=ax1)
+#     sns.barplot(x=df2.index, y=df2['RegDt'], color='gold', zorder=3, ax=ax2)
+#     sns.barplot(x=df3.index, y=df3['RegDt'], color='plum', zorder=3, ax=ax3)
+#
+#     ax1.set(xlabel="RegDt", ylabel="Count", title="monthly Count")
+#     ax2.set(xlabel="RegDt", ylabel="Count", title="by daily Count")
+#     ax3.set(xlabel="RegDt", ylabel="Count", title="by hourly Count")
+#     ax1.set_xticklabels(ax1.get_xticklabels(), rotation=90)
+#     ax2.set_xticklabels(ax2.get_xticklabels(), rotation=90)
+#     ax3.set_xticklabels(ax3.get_xticklabels(), rotation=90)
+#     ax1.yaxis.set_major_locator(MaxNLocator(integer=True))
+#     ax2.yaxis.set_major_locator(MaxNLocator(integer=True))
+#     ax3.yaxis.set_major_locator(MaxNLocator(integer=True))
+#     ax1.grid(True, axis='y', linestyle='dashed')
+#     ax2.grid(True, axis='y', linestyle='dashed')
+#     ax3.grid(True, axis='y', linestyle='dashed')
+#     fig.suptitle("{} - {}(0x{})".format(status_df['ChargerId'][0], status_df['exp'][0], mt))
+#     plt.tight_layout()
+#     plt.show()
+#     return df1, df2, df3
 
-    df1 = pd.DataFrame(status_df.groupby(status_df['RegDt'].dt.strftime('%m'))['RegDt'].count())
-    df2 = pd.DataFrame(status_df.groupby(status_df['RegDt'].dt.strftime('%m-%d'))['RegDt'].count())
-    df3 = pd.DataFrame(status_df.groupby(status_df['RegDt'].dt.strftime('%H'))['RegDt'].count())
-
-    fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(8, 8))
-    sns.barplot(x=df1.index, y=df1['RegDt'], color='cornflowerblue', zorder=3, ax=ax1)
-    sns.barplot(x=df2.index, y=df2['RegDt'], color='gold', zorder=3, ax=ax2)
-    sns.barplot(x=df3.index, y=df3['RegDt'], color='plum', zorder=3, ax=ax3)
-
-    ax1.set(xlabel="RegDt", ylabel="Count", title="monthly Count")
-    ax2.set(xlabel="RegDt", ylabel="Count", title="by daily Count")
-    ax3.set(xlabel="RegDt", ylabel="Count", title="by hourly Count")
-    ax1.set_xticklabels(ax1.get_xticklabels(), rotation=90)
-    ax2.set_xticklabels(ax2.get_xticklabels(), rotation=90)
-    ax3.set_xticklabels(ax3.get_xticklabels(), rotation=90)
-    ax1.yaxis.set_major_locator(MaxNLocator(integer=True))
-    ax2.yaxis.set_major_locator(MaxNLocator(integer=True))
-    ax3.yaxis.set_major_locator(MaxNLocator(integer=True))
-    ax1.grid(True, axis='y', linestyle='dashed')
-    ax2.grid(True, axis='y', linestyle='dashed')
-    ax3.grid(True, axis='y', linestyle='dashed')
-    fig.suptitle("{} - {}(0x{})".format(status_df['ChargerId'][0], status_df['exp'][0], mt))
-    plt.tight_layout()
-    plt.show()
-    return df1, df2, df3
-
-original_file = pd.read_csv(file_path + ".csv")
-original_file = convert_datetime(original_file)
-
-msg_sequence = sequence_mt(original_file)
-msg_sequence['mt'].unique()
-msg_sequence['exp'].value_counts().sum()
+# original_file = pd.read_csv(file_path + ".csv")
+# original_file = convert_datetime(original_file)
+#
+# msg_sequence = sequence_mt(original_file)
+# msg_sequence['mt'].unique()
+# msg_sequence['exp'].value_counts().sum()
 
 # msg_period_statistics(msg_sequence, '05')
 

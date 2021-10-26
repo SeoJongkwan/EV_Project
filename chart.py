@@ -102,7 +102,7 @@ def show_feature_importance(df, time, col):
 
 def show_variable_relation(df, time, col1, col2):
     fig, ax1 = plt.subplots(figsize=(18,6))
-    sns.lineplot(df[time], df[col1], label=col1, color='plum', ax=ax1)
+    sns.lineplot(x=df[time], y=df[col1], label=col1, color='plum', ax=ax1)
     ax1.set(xlabel=col2, ylabel=col1, title='{} & {} Relation'.format(col1, col2)), ax1.legend(loc=2)
     ax2 = ax1.twinx()
     sns.lineplot(df[time], df[col2], label=col2, color='gold', ax=ax2), ax2.legend(loc=1)
@@ -112,18 +112,18 @@ def show_variable_relation(df, time, col1, col2):
 
 def show_density(df, col):
     fig, (ax1, ax2) = plt.subplots(2, sharex=True, gridspec_kw={"height_ratios": (.15, .85)}, figsize=(18,4))
-    sns.boxplot(df[col], ax=ax1)
-    sns.distplot(df[col], norm_hist=True, ax=ax2)
+    sns.boxplot(x=df[col], ax=ax1)
+    sns.histplot(x=df[col], kde=True, ax=ax2)
     ax1.set(xlabel='')
-    ax2.set(xlabel=col, ylabel='density', title='{} Disribution Density'.format(col))
+    ax2.set(xlabel=col+' (Wh)', ylabel='density', title='{} Disribution Density'.format(col))
     plt.tight_layout()
     plt.show()
 
 
 def show_msg_period_statistics(df, file, mt):
-    print("Access Request Communication\nmonthly, daily, hourly statistics\n")
     status_df = df[df['mt'] == mt].reset_index(drop=True)
     print("{} / mt: {}".format(status_df['exp'][0], mt))
+    print("monthly, daily, hourly statistics\n")
 
     df1 = pd.DataFrame(status_df.groupby(status_df['RegDt'].dt.strftime('%m'))['RegDt'].count())
     df2 = pd.DataFrame(status_df.groupby(status_df['RegDt'].dt.strftime('%m-%d'))['RegDt'].count())
@@ -152,4 +152,11 @@ def show_msg_period_statistics(df, file, mt):
     return df1, df2, df3
 
 
-
+def show_access_request_freq(list, name):
+    df = pd.DataFrame(list, index=name, columns=['cnt']).sort_values(by='cnt')
+    df['cnt'].plot(kind='barh', color='navy', figsize=(10, 5))
+    plt.title("Access Request Count_210906_211015")
+    plt.grid(True, axis='x', linestyle='dashed', alpha=0.6)
+    plt.tight_layout()
+    plt.show()
+    return df.sort_values('cnt', ascending=False)
