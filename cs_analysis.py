@@ -31,18 +31,25 @@ print("select charger:", select_charger + "\n")
 charger_seq = globals()['charger{}_seq'.format(charger_no)]
 
 
-csr_file = pd.read_csv(args.data_path + select_charger + "_csr.csv")
-csr_ack_file = pd.read_csv(args.data_path + select_charger + "_csr_ack.csv")
-csr_file = stat.convert_datetime(csr_file)
-csr_ack_file = stat.convert_datetime(csr_ack_file)
+csr_cols = ['ChargerId', 'RegDt', 'ChargeCurrent', 'ChargeVoltage', 'AccumulatedWatt', 'ChargerNumber']
+for i in range(len(file.file_name)):
+    globals()['charger{}_csr'.format(i)] = pd.read_csv(args.data_path + globals()['charger_name{}'.format(i)] + "_csr.csv")
+    globals()['charger{}_csr'.format(i)] = stat.convert_datetime(globals()['charger{}_csr'.format(i)])
+    globals()['charger{}_csr'.format(i)] = globals()['charger{}_csr'.format(i)][csr_cols]
+    globals()['charger{}_csr'.format(i)]['RegDt'] = pd.to_datetime(globals()['charger{}_csr'.format(i)]['RegDt'], format='%Y-%m-%d %H:%M:%S')
 
-csr_cols = ['RegDt', 'ChargerId', 'ChargeCurrent', 'ChargeVoltage', 'AccumulatedWatt', 'ChargerNumber']
-csr = csr_file[csr_cols]
+select_csr = pd.read_csv(args.data_path + select_charger + "_csr.csv")
+select_csr = stat.convert_datetime(select_csr)
+csr_cols = ['ChargerId', 'RegDt', 'ChargeCurrent', 'ChargeVoltage', 'AccumulatedWatt', 'ChargerNumber']
+csr = select_csr[csr_cols]
 csr = csr.copy()
 csr['RegDt'] = pd.to_datetime(csr['RegDt'], format='%Y-%m-%d %H:%M:%S')
 
+
+select_csr_ack = pd.read_csv(args.data_path + select_charger + "_csr_ack.csv")
+select_csr_ack = stat.convert_datetime(select_csr_ack)
 csr_ack_cols = ['RegDt', 'ChargerId', 'RequireWatt', 'ChargingFee']
-csr_ack = csr_ack_file[csr_ack_cols]
+csr_ack = select_csr_ack[csr_ack_cols]
 csr_ack = csr_ack.copy()
 csr_ack['RegDt'] = pd.to_datetime(csr_ack['RegDt'], format='%Y-%m-%d %H:%M:%S')
 
@@ -74,3 +81,23 @@ msg_ar_cnt = []
 for i in range(len(file.file_name)):
     msg_ar_cnt.append(globals()['charger{}_seq'.format(i)]['exp'].value_counts()['Access Request'])
 chart.show_access_request_freq(msg_ar_cnt, list(map(lambda x: x[:-14], file_dic.values())))
+
+charger0_df = charger0_seq[charger0_seq['mt'] == '05'].reset_index(drop=True)
+df0 = pd.DataFrame(charger0_df.groupby(charger0_df['RegDt'].dt.strftime('%m'))['RegDt'].count())
+charger1_df = charger1_seq[charger1_seq['mt'] == '05'].reset_index(drop=True)
+df1 = pd.DataFrame(charger1_df.groupby(charger1_df['RegDt'].dt.strftime('%m'))['RegDt'].count())
+charger2_df = charger2_seq[charger2_seq['mt'] == '05'].reset_index(drop=True)
+df2 = pd.DataFrame(charger2_df.groupby(charger2_df['RegDt'].dt.strftime('%m'))['RegDt'].count())
+charger3_df = charger3_seq[charger3_seq['mt'] == '05'].reset_index(drop=True)
+df3 = pd.DataFrame(charger3_df.groupby(charger3_df['RegDt'].dt.strftime('%m'))['RegDt'].count())
+charger4_df = charger4_seq[charger4_seq['mt'] == '05'].reset_index(drop=True)
+df4 = pd.DataFrame(charger4_df.groupby(charger4_df['RegDt'].dt.strftime('%m'))['RegDt'].count())
+
+
+df11 = pd.concat([df0, df1], axis=1)
+df12 = pd.concat([df11, df2], axis=1)
+df13 = pd.concat([df12, df3], axis=1)
+df14 = pd.concat([df13, df4], axis=1)
+df14.columns =  [charger_name0[:-14], charger_name1[:-14], charger_name2[:-14], charger_name3[:-14], charger_name4[:-14]]
+
+df14
