@@ -24,7 +24,7 @@ for i in range(len(file.file_name)):
     globals()['charger{}_seq'.format(i)] = stat.sequence_mt(globals()['charger{}'.format(i)])
 print("charger list:\n", file_dic)
 
-charger_no = 1
+charger_no = 0
 select_charger = file_dic['charger_name{}'.format(charger_no)]
 print("select charger:", select_charger + "\n")
 
@@ -71,33 +71,47 @@ charger_seq['mt'].unique()
 charger_seq['exp'].value_counts().sum()
 
 # mag monthly, daily, hourly statistics
-chart.show_msg_period_statistics(charger_seq, select_charger, '15')
+chart.show_msg_period_statistics(charger_seq, select_charger, '05')
 
 # msg communication frequency
 stat.show_value_cnt(charger_seq, 'exp')
 
-# charger charging count
+# charger charging count: exp --> Access Request
 msg_ar_cnt = []
 for i in range(len(file.file_name)):
     msg_ar_cnt.append(globals()['charger{}_seq'.format(i)]['exp'].value_counts()['Access Request'])
-chart.show_access_request_freq(msg_ar_cnt, list(map(lambda x: x[:-14], file_dic.values())))
+chart.show_access_request_freq(msg_ar_cnt, file_dic.values())
 
-charger0_df = charger0_seq[charger0_seq['mt'] == '05'].reset_index(drop=True)
-df0 = pd.DataFrame(charger0_df.groupby(charger0_df['RegDt'].dt.strftime('%m'))['RegDt'].count())
-charger1_df = charger1_seq[charger1_seq['mt'] == '05'].reset_index(drop=True)
-df1 = pd.DataFrame(charger1_df.groupby(charger1_df['RegDt'].dt.strftime('%m'))['RegDt'].count())
-charger2_df = charger2_seq[charger2_seq['mt'] == '05'].reset_index(drop=True)
-df2 = pd.DataFrame(charger2_df.groupby(charger2_df['RegDt'].dt.strftime('%m'))['RegDt'].count())
-charger3_df = charger3_seq[charger3_seq['mt'] == '05'].reset_index(drop=True)
-df3 = pd.DataFrame(charger3_df.groupby(charger3_df['RegDt'].dt.strftime('%m'))['RegDt'].count())
-charger4_df = charger4_seq[charger4_seq['mt'] == '05'].reset_index(drop=True)
-df4 = pd.DataFrame(charger4_df.groupby(charger4_df['RegDt'].dt.strftime('%m'))['RegDt'].count())
+month_charging_cnt = []
+for i in range(len(file.file_name)):
+    month_charging_cnt.append((globals()['charger{}_seq'.format(i)][globals()['charger{}_seq'.format(i)]['exp'] == "Access Request"].groupby(charger0_seq['RegDt'].dt.strftime('%m'))['RegDt'].count()))
 
+aug = []
+oct = []
+for i in month_charging_cnt:
+    aug.append(i[0])
+    oct.append(i[1])
 
-df11 = pd.concat([df0, df1], axis=1)
-df12 = pd.concat([df11, df2], axis=1)
-df13 = pd.concat([df12, df3], axis=1)
-df14 = pd.concat([df13, df4], axis=1)
-df14.columns =  [charger_name0[:-14], charger_name1[:-14], charger_name2[:-14], charger_name3[:-14], charger_name4[:-14]]
+month_charging = {}
+month_charging["September"] = aug
+month_charging["October"] = oct
+chart.show_month_charging_cnt(month_charging, file_dic.values())
 
-df14
+# charger0_df = charger0_seq[charger0_seq['mt'] == '05'].reset_index(drop=True)
+# df0 = pd.DataFrame(charger0_df.groupby(charger0_df['RegDt'].dt.strftime('%m'))['RegDt'].count())
+# charger1_df = charger1_seq[charger1_seq['mt'] == '05'].reset_index(drop=True)
+# df1 = pd.DataFrame(charger1_df.groupby(charger1_df['RegDt'].dt.strftime('%m'))['RegDt'].count())
+# charger2_df = charger2_seq[charger2_seq['mt'] == '05'].reset_index(drop=True)
+# df2 = pd.DataFrame(charger2_df.groupby(charger2_df['RegDt'].dt.strftime('%m'))['RegDt'].count())
+# charger3_df = charger3_seq[charger3_seq['mt'] == '05'].reset_index(drop=True)
+# df3 = pd.DataFrame(charger3_df.groupby(charger3_df['RegDt'].dt.strftime('%m'))['RegDt'].count())
+# charger4_df = charger4_seq[charger4_seq['mt'] == '05'].reset_index(drop=True)
+# df4 = pd.DataFrame(charger4_df.groupby(charger4_df['RegDt'].dt.strftime('%m'))['RegDt'].count())
+#
+#
+# df11 = pd.concat([df0, df1], axis=1)
+# df12 = pd.concat([df11, df2], axis=1)
+# df13 = pd.concat([df12, df3], axis=1)
+# df14 = pd.concat([df13, df4], axis=1)
+# df14.columns =  [charger_name0[:-14], charger_name1[:-14], charger_name2[:-14], charger_name3[:-14], charger_name4[:-14]]
+#

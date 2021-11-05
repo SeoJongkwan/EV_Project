@@ -153,10 +153,26 @@ def show_msg_period_statistics(df, file, mt):
 
 
 def show_access_request_freq(list, name):
-    df = pd.DataFrame(list, index=name, columns=['cnt']).sort_values(by='cnt')
-    df['cnt'].plot(kind='barh', color='navy', figsize=(10, 5))
-    plt.title("Access Request Count_210906_211015")
-    plt.grid(True, axis='x', linestyle='dashed', alpha=0.6)
+    df = pd.DataFrame(list, index=name, columns=['cnt']).sort_values(by='cnt', ascending=False)
+    df['cnt'].plot(kind='bar', color='navy', figsize=(7, 5))
+    plt.title("충전기별 충전횟수")
+    plt.ylabel('count')
+    plt.grid(True, axis='y', linestyle='dashed', alpha=0.4)
     plt.tight_layout()
     plt.show()
     return df.sort_values('cnt', ascending=False)
+
+
+def show_month_charging_cnt(data, name):
+    df = pd.DataFrame(data, index=name)
+    df['cnt'] = df['September'] + df['October']
+    df = df.sort_values('cnt', ascending=False)
+    df = df.drop('cnt', axis=1)
+    df.plot(kind="bar", stacked=True, figsize=(8, 6))
+    plt.title("월별 충전기 충전횟수")
+    plt.ylabel('count')
+    plt.grid(True, axis='y', linestyle='dashed', alpha=0.4)
+    plt.legend(loc=1)
+    plt.tight_layout()
+    plt.show()
+    return df
