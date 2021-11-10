@@ -11,7 +11,7 @@ parser.add_argument('--data_path', default=path, help="path to input file")
 args = parser.parse_args()
 
 file = Data()
-select_file = file.file_name[0]
+select_file = file.file_name[4]
 print("Select File: {}".format(select_file))
 
 dsr_file = pd.read_csv(args.data_path + select_file + "_dsr.csv")
@@ -34,18 +34,17 @@ dsr_ratio = dsr['DeviceStatus'].value_counts().to_frame()
 dsr_status_cnt = chart.show_device_status_ratio(select_file, dsr_ratio, 1)
 
 # Device Status Code --> Error
-ds_error = chart.show_device_status(dsr, 'Error')
-ds_cable_error = chart.show_device_status(dsr, '충전케이블 연결오류')
-ds_emergency = chart.show_device_status(dsr, '비상버튼 작동')
+# ds_error = chart.show_device_status(dsr, 'Error')
+# ds_cable_error = chart.show_device_status(dsr, '충전케이블 연결오류')
+# ds_emergency = chart.show_device_status(dsr, '비상버튼 작동')
 
-ds_cable_error['RegDt']
 
-v = dsr[dsr["DeviceStatus"]=='충전케이블 연결오류']
-
-t = stat.get_date(dsr, '202107211013', 13, 'min')
-t1 = t[t['DeviceStatus']=='충전케이블 연결오류']
-
-dsr_charging = dsr.loc[dsr['DeviceStatus'] == 'Charging'].reset_index(drop=True)
+# v = dsr[dsr["DeviceStatus"]=='충전케이블 연결오류']
+#
+# t = stat.get_date(dsr, '202107211013', 13, 'min')
+# t1 = t[t['DeviceStatus']=='충전케이블 연결오류']
+#
+# dsr_charging = dsr.loc[dsr['DeviceStatus'] == 'Charging'].reset_index(drop=True)
 
 
 # chart.show_density(csr, 'AccumulatedWatt')

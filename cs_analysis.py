@@ -80,22 +80,96 @@ stat.show_value_cnt(charger_seq, 'exp')
 msg_ar_cnt = []
 for i in range(len(file.file_name)):
     msg_ar_cnt.append(globals()['charger{}_seq'.format(i)]['exp'].value_counts()['Access Request'])
-chart.show_access_request_freq(msg_ar_cnt, file_dic.values())
+# chart.show_access_request_freq(msg_ar_cnt, file_dic.values())
 
 month_charging_cnt = []
 for i in range(len(file.file_name)):
-    month_charging_cnt.append((globals()['charger{}_seq'.format(i)][globals()['charger{}_seq'.format(i)]['exp'] == "Access Request"].groupby(charger0_seq['RegDt'].dt.strftime('%m'))['RegDt'].count()))
+    globals()['charger{}_seq'.format(i)] = globals()['charger{}_seq'.format(i)][globals()['charger{}_seq'.format(i)]['exp'] == "Access Request"].reset_index(drop=True)
+    month_charging_cnt.append((globals()['charger{}_seq'.format(i)].groupby(globals()['charger{}_seq'.format(i)]['RegDt'].dt.strftime('%m'))['RegDt'].count()))
 
+month_charging = {}
 aug = []
 oct = []
 for i in month_charging_cnt:
     aug.append(i[0])
     oct.append(i[1])
-
-month_charging = {}
 month_charging["September"] = aug
 month_charging["October"] = oct
-chart.show_month_charging_cnt(month_charging, file_dic.values())
+mm = chart.show_month_charging_cnt(month_charging, file_dic.values())
+
+
+file_dic.values()
+month = [8, 9]
+def show_month_charging_cnt(data, name):
+    df = pd.DataFrame(data, index=name)
+    df['cnt'] = df['September'] + df['October']
+    df = df.sort_values('cnt', ascending=False)
+    df = df.drop('cnt', axis=1)
+    df.plot(kind="bar", stacked=True, figsize=(8, 6))
+    plt.title("월별 충전기 충전횟수")
+    plt.ylabel('count')
+    plt.grid(True, axis='y', linestyle='dashed', alpha=0.4)
+    plt.legend(loc=1)
+    plt.tight_layout()
+    plt.show()
+    return df
+
+
+# hour_charging_cnt = []
+# for i in range(len(file.file_name)):
+#     globals()['charger{}_seq'.format(i)] = globals()['charger{}_seq'.format(i)][globals()['charger{}_seq'.format(i)]['exp'] == "Access Request"].reset_index(drop=True)
+#     hour_charging_cnt.append((globals()['charger{}_seq'.format(i)].groupby(globals()['charger{}_seq'.format(i)]['RegDt'].dt.strftime('%h'))['RegDt'].count()))
+#
+# hour_charging = {}
+# one, two, three, four, five, six, seven, eight, nine, ten, eleven, twelve = [], [], [], [], [], [], [], [], [], [], [], []
+# for i in hour_charging_cnt:
+#     one.append(i[0])
+#     two.append(i[1])
+#     three.append(i[0])
+#     four.append(i[1])
+#     five.append(i[0])
+#     six.append(i[1])
+#     seven.append(i[0])
+#     eight.append(i[1])
+#     nine.append(i[0])
+#     ten.append(i[1])
+#     eleven.append(i[0])
+#     twelve.append(i[1])
+#
+# hour_charging["One"] = one
+# hour_charging["Two"] = two
+# hour_charging["Three"] = three
+# hour_charging["Four"] = four
+# hour_charging["Five"] = five
+# hour_charging["Six"] = six
+# hour_charging["Seven"] = seven
+# hour_charging["Eight"] = eight
+# hour_charging["Nine"] = nine
+# hour_charging["Ten"] = ten
+# hour_charging["Eleven"] = eleven
+# hour_charging["Twelve"] = twelve
+#
+#
+#
+# def show_hour_charging_cnt(data, name):
+#     df = pd.DataFrame(data, index=name)
+#     df['cnt'] = df['One']+df['Two']+df['Three']+df['Four']+df['Five']+df['Six']+df['Seven']+df['Eight']+df['Nine']+df['Ten']+df['Eleven']+df['Twelve']
+#     df = df.sort_values('cnt', ascending=False)
+#     df = df.drop('cnt', axis=1)
+#     df.plot(kind="barh", stacked=True, figsize=(8, 6))
+#     plt.title("월별 충전기 충전횟수")
+#     plt.ylabel('count')
+#     plt.grid(True, axis='y', linestyle='dashed', alpha=0.4)
+#     plt.legend(loc=1)
+#     plt.tight_layout()
+#     plt.show()
+#     return df
+#
+# hh = show_hour_charging_cnt(hour_charging, file_dic.values())
+
+
+
+
 
 # charger0_df = charger0_seq[charger0_seq['mt'] == '05'].reset_index(drop=True)
 # df0 = pd.DataFrame(charger0_df.groupby(charger0_df['RegDt'].dt.strftime('%m'))['RegDt'].count())
