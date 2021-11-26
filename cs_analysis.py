@@ -24,7 +24,7 @@ for i in range(len(file.file_name)):
     globals()['charger{}_seq'.format(i)] = stat.sequence_mt(globals()['charger{}'.format(i)])
 print("charger list:\n", file_dic)
 
-charger_no = 0
+charger_no = 4
 select_charger = file_dic['charger_name{}'.format(charger_no)]
 print("select charger:", select_charger + "\n")
 
