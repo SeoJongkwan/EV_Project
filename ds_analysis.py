@@ -11,6 +11,8 @@ parser.add_argument('--data_path', default=path, help="path to input file")
 args = parser.parse_args()
 
 file = Data()
+
+#충전기 선택
 select_file = file.file_name[4]
 print("Select File: {}".format(select_file))
 

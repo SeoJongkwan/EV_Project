@@ -24,7 +24,8 @@ for i in range(len(file.file_name)):
     globals()['charger{}_seq'.format(i)] = stat.sequence_mt(globals()['charger{}'.format(i)])
 print("charger list:\n", file_dic)
 
-charger_no = 4
+#충전기 선택
+charger_no = 0
 select_charger = file_dic['charger_name{}'.format(charger_no)]
 print("select charger:", select_charger + "\n")
 
@@ -90,11 +91,16 @@ for i in range(len(file.file_name)):
 month_charging = {}
 aug = []
 oct = []
+nov = []
 for i in month_charging_cnt:
     aug.append(i[0])
     oct.append(i[1])
+    nov.append(i[2])
+
 month_charging["September"] = aug
 month_charging["October"] = oct
+month_charging["November"] = nov
+
 mm = chart.show_month_charging_cnt(month_charging, file_dic.values())
 
 

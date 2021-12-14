@@ -9,18 +9,20 @@ import statistics as stat       #statistics module
 
 path = os.path.join(os.path.dirname(__file__), 'data/')
 parser = argparse.ArgumentParser()
-parser.add_argument('--data_path', default=path, help = "path to input file")
+parser.add_argument('--data_path', default=path, help="path to input file")
 args = parser.parse_args()
 
 file = Data()
 print("File List: {}".format(file.file_name))
-select_file = file.file_name[4]
+
+#충전기 선택
+select_file = file.file_name[0]
 print("Select File: {}".format(select_file))
 file_path = args.data_path + select_file + ".csv"
 
-msg_type = file.msg_type()      #message type
+msg_type = file.msg_type()              #message type
 data = file.read_file(file_path)
-msg_index = file.structure()    #header, body index location in msg
+msg_index = file.structure()            #header, body index location in msg
 
 #select message type
 mt = '16'

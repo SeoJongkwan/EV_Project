@@ -13,6 +13,8 @@ args = parser.parse_args()
 
 file = Data()
 print("File List: {}".format(file.file_name))
+
+#충전기 선택
 select_file = file.file_name[4]
 print("Select File: {}".format(select_file))
 file_path = args.data_path + select_file + ".csv"

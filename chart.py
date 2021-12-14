@@ -15,12 +15,12 @@ plt.rc('xtick', labelsize=10)
 plt.rc('ytick', labelsize=10)
 
 
-def show_value_cnt(df, file, col):
-    value_count = df[col].value_counts()
-    df[col].value_counts().plot(kind='barh', color='navy', figsize=(10, 5))
+def show_value_cnt(df, file, col, color):
+    value_count = df[col].value_counts(ascending=True)
+    df[col].value_counts(ascending=True).plot(kind='barh', color=color, figsize=(10, 5))
     for i, v in enumerate(value_count):
-        plt.text(v+10, i, str(v), fontweight='bold')
-    plt.title('{} / {} Info'.format(file, col))
+        plt.text(v+5, i, str(v), fontweight='bold')
+    plt.title('{} / {}'.format(file, col))
     plt.grid(True, axis='x')
     plt.tight_layout()
     plt.show()
@@ -48,13 +48,13 @@ def show_device_status(df, status):
 
 
 def show_device_status_ratio(file, df, min=2):
-    df['percent'] = None
+    df['ratio'] = None
     for i in range(len(df)):
         s = df['DeviceStatus'].sum()
-        df['percent'][i] = round((df['DeviceStatus'][i] / s)*100, 2)
-        if df['percent'][i] < min:
-            print("Remove ({}%) - {}: {}times / {}%".format(min, df.index[i], df['DeviceStatus'][i], df['percent'][i]))
-    df1 = df[df['percent'] > min]
+        df['ratio'][i] = round((df['DeviceStatus'][i] / s)*100, 2)
+        if df['ratio'][i] < min:
+            print("Remove ({}%) - {}: {}times / {}%".format(min, df.index[i], df['DeviceStatus'][i], df['ratio'][i]))
+    df1 = df[df['ratio'] > min]
     wedgeprops = {'width': 0.7, 'edgecolor': 'w', 'linewidth': 5}
     colors = sns.color_palette('pastel')
     plt.pie(df1['DeviceStatus'], labels=df1.index, autopct='%.1f%%', counterclock=False, colors=colors, wedgeprops=wedgeprops)
