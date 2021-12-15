@@ -34,16 +34,29 @@ merge_data.append(user9)
 merge_data.append(user10)
 merge_data.append(user11)
 
-df1 = pd.concat(merge_data)
+user_charger = pd.concat(merge_data)
+user_charger = user_charger.drop_duplicates(['충전시작', '이용자이름'], keep='first').reset_index(drop=True)
 
-col = '이용자이름'
-df1[col].unique()
-df1[col].value_counts()
-df1[col].value_counts().sum()
+user_charger.to_csv(PATH + '충전기이용내역/' + charger + '_충전기이용내역통합.csv')
+# user_charger1 = user_charger.fillna(10)
+# user_charger1.to_csv(PATH + '충전기이용내역/' + charger + '_충전기이용내역통합1.csv')
+user_identity = pd.read_csv(PATH + '충전기이용내역/' + charger + '_충전기이용내역통합_비식별.csv')
+user_identity.columns = ['충전시작','회원번호가명처리','비회원번호가명처리','이용자이름가명처리']
 
-len(df1[col].unique())
+user_charger_identity = pd.merge(user_charger.set_index('충전시작'), user_identity.set_index('충전시작'), left_index=True, right_index=True).reset_index()
 
-chart.show_value_cnt(df1, charger, '이용자이름', 'green')
+# c = '2021-10-07 08:00:35'
+# d = '2021-10-15 08:26:32'
+# f = user_charger[user_charger['충전시작'] == c]
+
+col = '이용자이름가명처리'
+user_charger_identity[col].unique()
+user_charger_identity[col].value_counts()
+user_charger_identity[col].value_counts().sum()
+
+len(user_charger_identity[col].unique())
+
+chart.show_value_cnt(user_charger_identity, charger, '이용자이름가명처리', 'green')
 
 
 
