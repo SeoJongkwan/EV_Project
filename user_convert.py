@@ -44,6 +44,7 @@ user_identity = pd.read_csv(PATH + '충전기이용내역/' + charger + '_추
 user_identity.columns = ['충전시작','회원번호가명처리','비회원번호가명처리','이용자이름가명처리']
 
 user_charger_identity = pd.merge(user_charger.set_index('충전시작'), user_identity.set_index('충전시작'), left_index=True, right_index=True).reset_index()
+user_charger_identity_member = user_charger_identity[user_charger_identity['이용자이름'] != '비회원']
 
 # c = '2021-10-07 08:00:35'
 # d = '2021-10-15 08:26:32'
@@ -57,6 +58,7 @@ user_charger_identity[col].value_counts().sum()
 len(user_charger_identity[col].unique())
 
 chart.show_value_cnt(user_charger_identity, charger, '이용자이름가명처리', 'green')
+chart.show_value_cnt1(user_charger_identity_member, charger, '이용자이름가명처리', 'green')
 
 
 

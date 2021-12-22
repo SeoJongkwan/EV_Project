@@ -26,6 +26,18 @@ def show_value_cnt(df, file, col, color):
     plt.show()
     return value_count
 
+
+def show_value_cnt1(df, file, col, color):
+    value_count = df[col].value_counts(ascending=True)
+    df[col].value_counts(ascending=True).plot(kind='barh', color=color, figsize=(10, 5))
+    plt.title('{} {}'.format(file, '충전기이용자'))
+    plt.xticks(range(value_count.min()-1, value_count.max()+1))
+    plt.grid(True, axis='x')
+    plt.tight_layout()
+    plt.show()
+    return value_count
+
+
 def show_device_status(df, status):
     status_df = df[df['DeviceStatus']==status].reset_index(drop=True)
     print("-DeviceStatus:", status)

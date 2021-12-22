@@ -47,16 +47,16 @@ csr = csr.copy()
 csr['RegDt'] = pd.to_datetime(csr['RegDt'], format='%Y-%m-%d %H:%M:%S')
 
 
-select_csr_ack = pd.read_csv(args.data_path + select_charger + "_csr_ack.csv")
-select_csr_ack = stat.convert_datetime(select_csr_ack)
-csr_ack_cols = ['RegDt', 'ChargerId', 'RequireWatt', 'ChargingFee']
-csr_ack = select_csr_ack[csr_ack_cols]
-csr_ack = csr_ack.copy()
-csr_ack['RegDt'] = pd.to_datetime(csr_ack['RegDt'], format='%Y-%m-%d %H:%M:%S')
-
-# delete NAN data
-csr = stat.check_nan_value(csr)
-csr_ack = stat.check_nan_value(csr_ack)
+# select_csr_ack = pd.read_csv(args.data_path + select_charger + "_csr_ack.csv")
+# select_csr_ack = stat.convert_datetime(select_csr_ack)
+# csr_ack_cols = ['RegDt', 'ChargerId', 'RequireWatt', 'ChargingFee']
+# csr_ack = select_csr_ack[csr_ack_cols]
+# csr_ack = csr_ack.copy()
+# csr_ack['RegDt'] = pd.to_datetime(csr_ack['RegDt'], format='%Y-%m-%d %H:%M:%S')
+#
+# # delete NAN data
+# csr = stat.check_nan_value(csr)
+# csr_ack = stat.check_nan_value(csr_ack)
 
 
 chart.show_density(csr, 'AccumulatedWatt')
